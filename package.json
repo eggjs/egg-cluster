@@ -4,7 +4,8 @@
   "description": "cluster manager for egg",
   "main": "index.js",
   "scripts": {
-    "test": "egg-bin test"
+    "test": "egg-bin test",
+    "autod": "autod"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/eggjs/egg-cluster#readme",
   "devDependencies": {
+    "autod": "^2.6.1",
     "egg-bin": "^1.0.1",
     "egg-ci": "^1.0.2",
     "eslint": "^3.0.1",
@@ -29,5 +31,14 @@
   },
   "ci": {
     "version": "4, 6"
+  },
+  "dependencies": {
+    "egg-loader": "^1.0.0",
+    "egg-logger": "^1.0.0",
+    "cfork": "^1.5.1",
+    "cluster-reload": "^1.0.2",
+    "debug": "^2.2.0",
+    "get-ready": "^1.0.0",
+    "sendmessage": "^1.0.5"
   }
 }
