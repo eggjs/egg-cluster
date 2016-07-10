@@ -1,0 +1,33 @@
+{
+  "name": "egg-cluster",
+  "version": "1.0.0",
+  "description": "cluster manager for egg",
+  "main": "index.js",
+  "scripts": {
+    "test": "egg-bin test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eggjs/egg-cluster.git"
+  },
+  "keywords": [
+    "egg",
+    "cluster",
+    "process"
+  ],
+  "author": "dead-horse <dead_horse@qq.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eggjs/egg-cluster/issues"
+  },
+  "homepage": "https://github.com/eggjs/egg-cluster#readme",
+  "devDependencies": {
+    "egg-bin": "^1.0.1",
+    "egg-ci": "^1.0.2",
+    "eslint": "^3.0.1",
+    "eslint-config-egg": "^3.0.1"
+  },
+  "ci": {
+    "version": "4, 6"
+  }
+}
