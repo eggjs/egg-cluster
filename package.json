@@ -22,6 +22,15 @@
     "url": "https://github.com/eggjs/egg-cluster/issues"
   },
   "homepage": "https://github.com/eggjs/egg-cluster#readme",
+  "dependencies": {
+    "egg-loader": "^0.0.2",
+    "egg-logger": "^1.0.0",
+    "cfork": "^1.5.1",
+    "cluster-reload": "^1.0.2",
+    "debug": "^2.2.0",
+    "get-ready": "^1.0.0",
+    "sendmessage": "^1.0.5"
+  },
   "devDependencies": {
     "autod": "^2.6.1",
     "egg-bin": "^1.0.1",
@@ -29,16 +38,10 @@
     "eslint": "^3.0.1",
     "eslint-config-egg": "^3.0.1"
   },
+  "engines": {
+    "node": ">= 4.4.7"
+  },
   "ci": {
     "version": "4, 6"
-  },
-  "dependencies": {
-    "egg-loader": "^1.0.0",
-    "egg-logger": "^1.0.0",
-    "cfork": "^1.5.1",
-    "cluster-reload": "^1.0.2",
-    "debug": "^2.2.0",
-    "get-ready": "^1.0.0",
-    "sendmessage": "^1.0.5"
   }
 }
