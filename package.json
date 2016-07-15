@@ -1,6 +1,6 @@
 {
   "name": "egg-cluster",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "cluster manager for egg",
   "main": "index.js",
   "scripts": {
