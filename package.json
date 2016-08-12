@@ -30,19 +30,18 @@
     "cfork": "^1.5.1",
     "cluster-reload": "^1.0.2",
     "debug": "^2.2.0",
-    "egg-loader": "^0.0.2",
-    "egg-logger": "^1.0.1",
+    "egg-logger": "^1.2.0",
     "get-ready": "^1.0.0",
     "sendmessage": "^1.0.5"
   },
   "devDependencies": {
-    "autod": "^2.6.1",
+    "autod": "^2.7.0",
     "coffee": "^3.2.4",
     "egg": "*",
-    "egg-bin": "^1.0.2",
+    "egg-bin": "^1.2.0",
     "egg-ci": "^1.0.2",
     "egg-mock": "*",
-    "eslint": "^3.1.1",
+    "eslint": "^3.3.1",
     "eslint-config-egg": "^3.1.0",
     "pedding": "^1.0.0",
     "should": "^10.0.0",
@@ -53,6 +52,5 @@
   },
   "ci": {
     "version": "4, 6"
-  },
-  "license": "mit"
+  }
 }
