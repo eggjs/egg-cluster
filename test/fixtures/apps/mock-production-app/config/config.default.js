@@ -8,3 +8,5 @@ exports.watcher = {
 exports.logger = {
   level: 'DEBUG',
 };
+
+exports.keys = 'foo,bar';
