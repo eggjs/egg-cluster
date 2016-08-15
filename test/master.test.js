@@ -31,7 +31,11 @@ describe('test/lib/cluster/master.test.js', () => {
       .expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
       .expect('code', 0)
-      .end(done);
+      .end(() => {
+        console.log(app.stdout);
+        console.log(app.stderr);
+        done();
+      });
     });
   });
 
