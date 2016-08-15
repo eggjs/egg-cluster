@@ -3,3 +3,4 @@ coverage
 .logs
 logs
 run
+.tmp

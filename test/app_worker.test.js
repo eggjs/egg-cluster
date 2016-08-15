@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require('fs');
 const mm = require('egg-mock');
 const request = require('supertest');
 const utils = require('./utils');
@@ -51,11 +50,6 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       .get('/exit')
       // wait app worker restart
       .end(() => setTimeout(() => {
-        const errorFile = utils.getFilepath('apps/app-die/logs/app-die/common-error.log');
-        const content = fs.readFileSync(errorFile, 'utf8');
-        content.should.match(/nodejs.AppWorkerDiedError: \[master\]/);
-        content.should.match(/App Worker#1:\d+ died/);
-
         app.expect('stdout', /App Worker#1:\d+ disconnect/);
         app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
         app.expect('stderr', /App Worker#1:\d+ died/);
@@ -84,20 +78,10 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       .get('/exit')
       // wait app worker restart
       .end(() => setTimeout(() => {
-        const errorFile = utils.getFilepath('apps/app-die/logs/app-die/common-error.log');
-        const content = fs.readFileSync(errorFile, 'utf8');
-        content.should.match(/nodejs.AppWorkerDiedError: \[master\]/);
-        content.should.match(/App Worker#1:\d+ died/);
-
         app.expect('stdout', /App Worker#1:\d+ disconnect/);
-        app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
-        app.expect('stderr', /App Worker#1:\d+ died/);
-
-        // won't refork
-        app.notExpect('stdout', /App Worker#2:\d+ started/);
-
+        app.expect('stderr', /don't fork new work/);
         done();
-      }, 10000));
+      }, 5000));
     });
   });
 });
