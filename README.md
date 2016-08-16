@@ -1,4 +1,4 @@
-# egg-logger
+# egg-cluster
 
 [![NPM version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]
@@ -20,7 +20,7 @@
 [download-image]: https://img.shields.io/npm/dm/egg-cluster.svg?style=flat-square
 [download-url]: https://npmjs.org/package/egg-cluster
 
-Egg cluster.
+Cluster Manager for Egg
 
 ---
 
@@ -32,8 +32,36 @@ $ npm i egg-cluster
 
 ## Usage
 
-TBD
+```js
+const startCluster = require('egg-cluster').startCluster;
+startCluster({
+  baseDir: '/path/to/app',
+  customEgg: '/path/to/framework',
+});
+```
+
+You can specify a callback that will be invoked when application has started. However, master process will exit when catch an error.
+
+```js
+startCluster(options, () => {
+  console.log('started');
+});
+```
+
+## Options
+
+| Param     | Type      | Description              |
+| --------- | --------- | ------------------------ |
+| baseDir   | `String`  | directory of application |
+| customEgg | `String`  | directory of framework   |
+| plugins   | `Object`  | plugins for unittest     |
+| workers   | `Number`  | numbers of app workers   |
+| port      | `Number`  | port                     |
+| https     | `Boolean` | start a https server     |
+| key       | `String`  | ssl key                  |
+| cert      | `String`  | ssl cert                 |
 
 ## License
 
 [MIT](LICENSE)
+
