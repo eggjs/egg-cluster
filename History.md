@@ -1,4 +1,10 @@
 
+0.1.0 / 2016-08-16
+==================
+
+  * feat: [BREAKING_CHANGE] master won't load config  (#4)
+  * test: add test cases (#3)
+
 0.0.4 / 2016-07-16
 ==================
 
