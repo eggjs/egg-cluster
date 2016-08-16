@@ -13,14 +13,14 @@ describe('test/options.test.js', function() {
 
   it('should start with http and listen 7001', function() {
     parseOptions({
-      eggPath: path.dirname(require.resolve('egg')),
+      customEgg: path.dirname(require.resolve('egg')),
     }).port.should.equal(7001);
   });
 
   it('should start with https and listen 8443', function() {
     parseOptions({
       https: true,
-      eggPath: path.dirname(require.resolve('egg')),
+      customEgg: path.dirname(require.resolve('egg')),
       key: utils.getFilepath('server.key'),
       cert: utils.getFilepath('server.crt'),
     }).port.should.equal(8443);
@@ -29,7 +29,7 @@ describe('test/options.test.js', function() {
   it('should listen custom port 6001', function() {
     parseOptions({
       port: '6001',
-      eggPath: path.dirname(require.resolve('egg')),
+      customEgg: path.dirname(require.resolve('egg')),
     }).port.should.equal(6001);
   });
 
@@ -37,7 +37,7 @@ describe('test/options.test.js', function() {
     mm(process.env, 'NODE_ENV', 'production');
     parseOptions({
       workers: 1,
-      eggPath: path.dirname(require.resolve('egg')),
+      customEgg: path.dirname(require.resolve('egg')),
     }).workers.should.equal(1);
     process.env.NO_DEPRECATION.should.equal('*');
     process.env.NO_DEPRECATION = '';
@@ -46,11 +46,11 @@ describe('test/options.test.js', function() {
 
   it('should not extend when port is null/undefined', function() {
     parseOptions({
-      eggPath: path.dirname(require.resolve('egg')),
+      customEgg: path.dirname(require.resolve('egg')),
       port: null,
     }).port.should.equal(7001);
     parseOptions({
-      eggPath: path.dirname(require.resolve('egg')),
+      customEgg: path.dirname(require.resolve('egg')),
       port: undefined,
     }).port.should.equal(7001);
   });
@@ -59,7 +59,7 @@ describe('test/options.test.js', function() {
     mm.syncError(os, 'cpus', 'should not call os.cpus');
     parseOptions({
       workers: 1,
-      eggPath: path.dirname(require.resolve('egg')),
+      customEgg: path.dirname(require.resolve('egg')),
     }).workers.should.equal(1);
   });
 });

@@ -50,14 +50,18 @@ startCluster(options, () => {
 
 ## Options
 
-| Param     | Type     | Description              |
-| --------- | -------- | ------------------------ |
-| baseDir   | `String` | directory of application |
-| customEgg | `String` | directory of framework   |
-| plugins   | `Object` | plugins for unittest     |
-| workers   | `Number` | process number           |
-| port      | `Number` | port                     |
+| Param     | Type      | Description              |
+| --------- | --------- | ------------------------ |
+| baseDir   | `String`  | directory of application |
+| customEgg | `String`  | directory of framework   |
+| plugins   | `Object`  | plugins for unittest     |
+| workers   | `Number`  | numbers of app workers   |
+| port      | `Number`  | port                     |
+| https     | `Boolean` | start a https server     |
+| key       | `String`  | ssl key                  |
+| cert      | `String`  | ssl cert                 |
 
 ## License
 
 [MIT](LICENSE)
+
