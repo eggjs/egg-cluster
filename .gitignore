@@ -4,3 +4,4 @@ coverage
 logs
 run
 .tmp
+*.log

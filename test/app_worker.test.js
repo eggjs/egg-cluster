@@ -109,4 +109,16 @@ describe('test/lib/cluster/app_worker.test.js', () => {
         }, 3000));
     });
   });
+
+  describe('app start timeout', () => {
+    it('should exit', function(done) {
+      app = utils.cluster('apps/app-start-timeout');
+      app.expect('code', 1)
+      .expect('stderr', /\[master\] worker start fail, exit now/)
+      .expect('stderr', /\[app_worker\] App Worker start timeout, exiting now!/)
+      .expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/)
+      .expect('stderr', /App Worker#1:\d+ died/)
+      .end(done);
+    });
+  });
 });
