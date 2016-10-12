@@ -84,4 +84,29 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       }, 5000));
     });
   });
+
+  describe('app worker kill when env === "local"', () => {
+    before(done => {
+      mm.env('local');
+      app = utils.cluster('apps/app-kill', { opt: { execArgv: [ '--debug' ] } });
+      app.debug(false);
+      app.ready(done);
+    });
+    after(() => {
+      mm.restore();
+      app.close();
+    });
+    it('should exit', done => {
+      request(app.callback())
+        .get('/kill?signal=SIGKILL')
+        // wait app worker restart
+        .end(() => setTimeout(() => {
+          app.expect('stdout', /App Worker#1:\d+ disconnect/);
+          app.expect('stderr', /Debugger listening on/);
+          app.expect('stderr', /don't fork new work/);
+          app.expect('stderr', /\[master\] kill by debugger/);
+          done();
+        }, 3000));
+    });
+  });
 });
