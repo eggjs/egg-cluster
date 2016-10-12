@@ -1,4 +1,10 @@
 
+0.2.0 / 2016-10-12
+==================
+
+  * feat: when debug mode, master should exit when worker die (#7)
+  * test: fix testcase (#5)
+
 0.1.0 / 2016-08-16
 ==================
 
