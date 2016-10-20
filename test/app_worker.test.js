@@ -22,16 +22,15 @@ describe('test/lib/cluster/app_worker.test.js', () => {
   });
 
   it('should exit when app worker error during boot', done => {
-    app = utils.cluster('apps/worker-die')
-    .debug(false)
+    app = utils.cluster('apps/worker-die');
+    app.debug(false)
     .expect('code', 1)
     .end(done);
   });
 
   it('should ignore listen to other port', done => {
-    app = utils.cluster('apps/other-port')
-    .notExpect('stdout', /started at 7002/)
-    .end(done);
+    app = utils.cluster('apps/other-port');
+    app.notExpect('stdout', /started at 7002/).end(done);
   });
 
   describe('app worker error in env === "default"', () => {

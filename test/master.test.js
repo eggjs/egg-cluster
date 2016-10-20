@@ -18,8 +18,9 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('start success in local env', done => {
       mm.env('local');
-      app = utils.cluster('apps/master-worker-started')
-      .expect('stdout', /egg start/)
+      app = utils.cluster('apps/master-worker-started');
+
+      app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
       .expect('code', 0)
       .end(done);
@@ -27,8 +28,9 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('start success in prod env', done => {
       mm.env('prod');
-      app = utils.cluster('apps/mock-production-app')
-      .expect('stdout', /egg start/)
+      app = utils.cluster('apps/mock-production-app');
+
+      app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
       .expect('code', 0)
       .end(() => {
@@ -42,8 +44,9 @@ describe('test/lib/cluster/master.test.js', () => {
   describe('close master', () => {
     it('master will close agent', done => {
       mm.env('local');
-      app = utils.cluster('apps/master-worker-started')
-      .expect('stdout', /egg start/)
+      app = utils.cluster('apps/master-worker-started');
+
+      app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
       .expect('code', 0)
       .end(function(err) {
@@ -60,8 +63,9 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('use SIGTERM close master', done => {
       mm.env('local');
-      app = utils.cluster('apps/master-worker-started')
-      .expect('stdout', /egg start/)
+      app = utils.cluster('apps/master-worker-started');
+
+      app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
       .expect('code', 0)
       .end(function(err) {
@@ -78,8 +82,9 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('use SIGQUIT close master', done => {
       mm.env('local');
-      app = utils.cluster('apps/master-worker-started')
-      .expect('stdout', /egg start/)
+      app = utils.cluster('apps/master-worker-started');
+
+      app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
       .expect('code', 0)
       .end(function(err) {
@@ -96,8 +101,9 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('use SIGINT close master', done => {
       mm.env('local');
-      app = utils.cluster('apps/master-worker-started')
-      .expect('stdout', /egg start/)
+      app = utils.cluster('apps/master-worker-started');
+
+      app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
       .expect('code', 0)
       .end(function(err) {
@@ -118,8 +124,9 @@ describe('test/lib/cluster/master.test.js', () => {
       app.close();
     });
     it('parent -> app/agent', done => {
-      app = utils.cluster('apps/messenger')
-      .end(() => {
+      app = utils.cluster('apps/messenger');
+
+      app.end(() => {
         app.proc.send({
           action: 'parent2app',
           data: 'parent -> app',
@@ -140,8 +147,8 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('app/agent -> parent', done => {
       done = pedding(3, done);
-      app = utils.cluster('apps/messenger')
-      .end(done);
+      app = utils.cluster('apps/messenger');
+      app.end(done);
 
       setTimeout(() => {
         app.proc.on('message', msg => {
@@ -152,8 +159,9 @@ describe('test/lib/cluster/master.test.js', () => {
     });
 
     it('should app <-> agent', done => {
-      app = utils.cluster('apps/messenger')
-      .expect('stdout', /app -> agent/)
+      app = utils.cluster('apps/messenger');
+
+      app.expect('stdout', /app -> agent/)
       .expect('stdout', /agent -> app/)
       .expect('stdout', /agent2appbystring/)
       .end(() => setTimeout(done, 1000));
