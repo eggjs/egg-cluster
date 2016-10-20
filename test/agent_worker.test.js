@@ -16,8 +16,8 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
     });
 
     it('should exist when error happened during boot', done => {
-      app = utils.cluster('apps/agent-die-onboot')
-      .debug(false)
+      app = utils.cluster('apps/agent-die-onboot');
+      app.debug(false)
       .expect('code', 1)
       .expect('stderr', /\[master\] agent start fail, exit now/)
       .expect('stderr', /error: app worker throw/)
@@ -25,8 +25,8 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
     });
 
     it('should refork after app start', done => {
-      app = utils.cluster('apps/agent-die')
-      .debug(false)
+      app = utils.cluster('apps/agent-die');
+      app.debug(false)
       .end(function() {
         app.process.send({
           to: 'agent',
@@ -42,8 +42,8 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
     });
 
     it('should exit during app worker boot', done => {
-      app = utils.cluster('apps/agent-die-on-forkapp')
-      .debug(false)
+      app = utils.cluster('apps/agent-die-on-forkapp');
+      app.debug(false)
       .expect('code', 1)
       .expect('stderr', /agent start fail/)
       .notExpect('stdout', /App Worker#2/)

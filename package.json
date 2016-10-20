@@ -36,16 +36,16 @@
   },
   "devDependencies": {
     "autod": "^2.7.1",
-    "coffee": "^3.2.5",
+    "coffee": "^3.3.0",
     "egg": "*",
-    "egg-bin": "^1.4.0",
+    "egg-bin": "^1.5.0",
     "egg-ci": "^1.0.2",
     "egg-mock": "^0.0.5",
-    "eslint": "^3.7.1",
+    "eslint": "^3.8.1",
     "eslint-config-egg": "^3.1.0",
     "pedding": "^1.0.0",
     "should": "^11.1.1",
-    "supertest": "^2.0.0"
+    "supertest": "^2.0.1"
   },
   "engines": {
     "node": ">= 4.4.7"
