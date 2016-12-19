@@ -120,4 +120,5 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       .end(done);
     });
   });
+
 });

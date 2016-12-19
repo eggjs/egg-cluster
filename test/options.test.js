@@ -62,4 +62,21 @@ describe('test/options.test.js', function() {
       customEgg: path.dirname(require.resolve('egg')),
     }).workers.should.equal(1);
   });
+
+  describe('options', () => {
+    let app;
+    before(done => {
+      app = utils.cluster('apps/options', {
+        foo: true,
+      });
+      app.ready(done);
+    });
+    after(() => {
+      app.close();
+    });
+    it('should be passed through', () => {
+      app.expect('stdout', /app options foo: true/);
+      app.expect('stdout', /agent options foo: true/);
+    });
+  });
 });
