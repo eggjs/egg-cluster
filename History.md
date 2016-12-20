@@ -1,4 +1,11 @@
 
+1.1.0 / 2016-12-20
+==================
+
+  * deps: upgrade dependencies
+  * refactor: options should be passed through
+  * feat: print env when start (#8)
+
 1.0.0 / 2016-10-12
 ==================
 
