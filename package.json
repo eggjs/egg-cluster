@@ -11,6 +11,10 @@
     "ci": "npm run lint && npm run cov",
     "autod": "autod"
   },
+  "files": [
+    "lib",
+    "index.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eggjs/egg-cluster.git"
