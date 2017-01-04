@@ -4,10 +4,13 @@ const mm = require('egg-mock');
 const request = require('supertest');
 const utils = require('./utils');
 
-describe('test/lib/cluster/app_worker.test.js', () => {
+describe('test/app_worker.test.js', () => {
   let app;
 
-  afterEach(() => app.close());
+  afterEach(() => {
+    mm.restore();
+    app.close();
+  });
 
   describe('app worker', () => {
     before(done => {
@@ -60,10 +63,36 @@ describe('test/lib/cluster/app_worker.test.js', () => {
     });
   });
 
-
-  describe('app worker error when env === "local"', () => {
+  describe('app worker error in env === "local"', () => {
     before(done => {
       mm.env('local');
+      app = utils.cluster('apps/app-die');
+      app.debug(false);
+      app.ready(done);
+    });
+    after(() => {
+      mm.restore();
+      app.close();
+    });
+    it('should restart', done => {
+      request(app.callback())
+      .get('/exit')
+      // wait app worker restart
+      .end(() => setTimeout(() => {
+        app.expect('stdout', /App Worker#1:\d+ disconnect/);
+        app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
+        app.expect('stderr', /App Worker#1:\d+ died/);
+        app.expect('stdout', /App Worker#2:\d+ started/);
+
+        done();
+      // wait to run coverage
+      }, 10000));
+    });
+  });
+
+  describe('app worker error when env === "unittest"', () => {
+    before(done => {
+      mm.env('unittest');
       app = utils.cluster('apps/app-die');
       app.debug(false);
       app.ready(done);
@@ -84,9 +113,9 @@ describe('test/lib/cluster/app_worker.test.js', () => {
     });
   });
 
-  describe('app worker kill when env === "local"', () => {
+  describe('app worker kill when env === "unittest"', () => {
     before(done => {
-      mm.env('local');
+      mm.env('unittest');
       app = utils.cluster('apps/app-kill', { opt: { execArgv: [ '--debug' ] } });
       app.debug(false);
       app.ready(done);
@@ -110,7 +139,7 @@ describe('test/lib/cluster/app_worker.test.js', () => {
   });
 
   describe('app start timeout', () => {
-    it('should exit', function(done) {
+    it('should exit', done => {
       app = utils.cluster('apps/app-start-timeout');
       app.expect('code', 1)
       .expect('stderr', /\[master\] worker start fail, exit now/)
@@ -120,5 +149,4 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       .end(done);
     });
   });
-
 });
