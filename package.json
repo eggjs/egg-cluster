@@ -34,6 +34,7 @@
     "cfork": "^1.6.0",
     "cluster-reload": "^1.0.2",
     "debug": "^2.4.5",
+    "detect-port": "^1.1.0",
     "egg-logger": "^1.5.0",
     "get-ready": "^1.0.0",
     "sendmessage": "^1.1.0"
