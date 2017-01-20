@@ -22,6 +22,7 @@ describe('test/lib/cluster/master.test.js', () => {
 
       app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
+      .expect('stdout', /\\"clusterPort\\":\d+/)
       .expect('code', 0)
       .end(done);
     });
