@@ -33,7 +33,7 @@
   "dependencies": {
     "cfork": "^1.6.0",
     "cluster-reload": "^1.0.2",
-    "debug": "^2.4.5",
+    "debug": "^2.6.0",
     "detect-port": "^1.1.0",
     "egg-logger": "^1.5.0",
     "get-ready": "^1.0.0",
@@ -43,19 +43,19 @@
     "autod": "^2.7.1",
     "coffee": "^3.3.0",
     "egg": "*",
-    "egg-bin": "^1.9.1",
+    "egg-bin": "^2.0.1",
     "egg-ci": "^1.0.2",
-    "egg-mock": "^1.2.0",
-    "eslint": "^3.12.2",
+    "egg-mock": "^2.1.0",
+    "eslint": "^3.14.0",
     "eslint-config-egg": "^3.2.0",
     "pedding": "^1.1.0",
     "should": "^11.1.2",
     "supertest": "^2.0.1"
   },
   "engines": {
-    "node": ">= 4.4.7"
+    "node": ">= 6.0.0"
   },
   "ci": {
-    "version": "4, 6"
+    "version": "6, 7"
   }
 }

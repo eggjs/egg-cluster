@@ -340,4 +340,20 @@ describe('test/lib/cluster/master.test.js', () => {
     });
 
   });
+
+  describe('debug port', () => {
+    let app;
+    afterEach(() => {
+      app.close();
+    });
+
+    it('should set agent\'s debugPort', done => {
+      app = utils.cluster('apps/agent-debug-port');
+
+      app
+      .coverage(false)
+      .expect('stdout', /debug port of agent is 5856/)
+      .end(done);
+    });
+  });
 });
