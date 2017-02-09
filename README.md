@@ -56,6 +56,7 @@ startCluster(options, () => {
 | customEgg | `String`  | directory of framework   |
 | plugins   | `Object`  | plugins for unittest     |
 | workers   | `Number`  | numbers of app workers   |
+| sticky    | `Boolean` | sticky mode server       |
 | port      | `Number`  | port                     |
 | https     | `Boolean` | start a https server     |
 | key       | `String`  | ssl key                  |
