@@ -356,4 +356,22 @@ describe('test/lib/cluster/master.test.js', () => {
       .end(done);
     });
   });
+
+  describe('--sticky', () => {
+    before(done => {
+      app = utils.cluster('apps/cluster_mod_sticky', { sticky: true });
+      app.ready(done);
+    });
+
+    after(() => {
+      app.close();
+    });
+
+    it('should online sticky cluster mode startup success', done => {
+      request(app.callback())
+      .get('/portal/i.htm')
+      .expect('hi cluster')
+      .expect(200, done);
+    });
+  });
 });

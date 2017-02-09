@@ -5,3 +5,4 @@ logs
 run
 .tmp
 *.log
+.vscode
