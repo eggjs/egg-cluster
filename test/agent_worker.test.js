@@ -11,9 +11,7 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
   let app;
 
   describe('Fork Agent', () => {
-    afterEach(() => {
-      app.close();
-    });
+    afterEach(() => app.close());
 
     it('should exist when error happened during boot', done => {
       app = utils.cluster('apps/agent-die-onboot');
@@ -64,14 +62,12 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
   });
 
   describe('agent custom loggers', () => {
-    before(done => {
+    before(() => {
       app = utils.cluster('apps/custom-logger');
-      app.ready(done);
+      return app.ready();
     });
 
-    after(() => {
-      app.close();
-    });
+    after(() => app.close());
 
     it('should support custom logger in agent', done => {
       setTimeout(() => {

@@ -10,9 +10,9 @@ describe('test/lib/cluster/app_worker.test.js', () => {
   afterEach(() => app.close());
 
   describe('app worker', () => {
-    before(done => {
+    before(() => {
       app = utils.cluster('apps/app-server');
-      return app.ready(done);
+      return app.ready();
     });
     it('should emit `server`', done => {
       request(app.callback())
@@ -34,11 +34,11 @@ describe('test/lib/cluster/app_worker.test.js', () => {
   });
 
   describe('app worker error in env === "default"', () => {
-    before(done => {
+    before(() => {
       mm.env('default');
       app = utils.cluster('apps/app-die');
       app.debug(false);
-      app.ready(done);
+      return app.ready();
     });
     after(() => {
       mm.restore();
@@ -62,11 +62,11 @@ describe('test/lib/cluster/app_worker.test.js', () => {
 
 
   describe('app worker error when env === "local"', () => {
-    before(done => {
+    before(() => {
       mm.env('local');
       app = utils.cluster('apps/app-die');
       app.debug(false);
-      app.ready(done);
+      return app.ready();
     });
     after(() => {
       mm.restore();
@@ -85,11 +85,11 @@ describe('test/lib/cluster/app_worker.test.js', () => {
   });
 
   describe('app worker kill when env === "local"', () => {
-    before(done => {
+    before(() => {
       mm.env('local');
       app = utils.cluster('apps/app-kill', { opt: { execArgv: [ '--debug' ] } });
       app.debug(false);
-      app.ready(done);
+      return app.ready();
     });
     after(() => {
       mm.restore();

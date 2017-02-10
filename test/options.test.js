@@ -65,15 +65,13 @@ describe('test/options.test.js', function() {
 
   describe('options', () => {
     let app;
-    before(done => {
+    before(() => {
       app = utils.cluster('apps/options', {
         foo: true,
       });
-      app.ready(done);
+      return app.ready();
     });
-    after(() => {
-      app.close();
-    });
+    after(() => app.close());
     it('should be passed through', () => {
       app.expect('stdout', /app options foo: true/);
       app.expect('stdout', /agent options foo: true/);
