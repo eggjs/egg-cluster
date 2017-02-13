@@ -182,14 +182,12 @@ describe('test/lib/cluster/master.test.js', () => {
 
   describe('--cluster', () => {
 
-    before(done => {
+    before(() => {
       app = utils.cluster('apps/cluster_mod_app');
-      app.ready(done);
+      return app.ready();
     });
 
-    after(() => {
-      app.close();
-    });
+    after(() => app.close());
 
     it('should online cluster mode startup success', done => {
       request(app.callback())
@@ -206,11 +204,11 @@ describe('test/lib/cluster/master.test.js', () => {
       app.close();
     });
 
-    before(done => {
+    before(() => {
       app = utils.cluster('apps/frameworkapp', {
         customEgg: utils.getFilepath('apps/frameworkbiz'),
       });
-      app.ready(done);
+      return app.ready();
     });
 
     it('should start with prod env', done => {
@@ -228,16 +226,14 @@ describe('test/lib/cluster/master.test.js', () => {
   describe('reload worker', () => {
     let app;
 
-    after(() => {
-      app.close();
-    });
+    after(() => app.close());
 
-    before(done => {
+    before(() => {
       app = utils.cluster('apps/reload-worker', {
         workers: 4,
       });
       app.debug(false);
-      app.ready(done);
+      return app.ready();
     });
 
     it('should restart 4 workers', done => {
@@ -256,14 +252,12 @@ describe('test/lib/cluster/master.test.js', () => {
   describe('after started', () => {
     let app;
 
-    after(() => {
-      app.close();
-    });
+    after(() => app.close());
 
-    before(done => {
+    before(() => {
       app = utils.cluster('apps/egg-ready');
       app.debug(false);
-      app.ready(done);
+      return app.ready();
     });
 
     it('app/agent should recieve egg-ready', done => {
@@ -278,16 +272,14 @@ describe('test/lib/cluster/master.test.js', () => {
 
   describe('agent should recieve app worker nums', () => {
     let app;
-    before(done => {
+    before(() => {
       mm.env('default');
       app = utils.cluster('apps/pid', { workers: 2 });
       app.coverage(false);
       app.debug(false);
-      app.ready(done);
+      return app.ready();
     });
-    after(() => {
-      app.close();
-    });
+    after(() => app.close());
 
     it('should every app worker will get message', done => {
       setTimeout(() => {
@@ -315,16 +307,14 @@ describe('test/lib/cluster/master.test.js', () => {
 
   describe('app should recieve agent worker nums', () => {
     let app;
-    before(done => {
+    before(() => {
       mm.env('default');
       app = utils.cluster('apps/pid');
       app.coverage(false);
       app.debug(false);
-      app.ready(done);
+      return app.ready();
     });
-    after(() => {
-      app.close();
-    });
+    after(() => app.close());
 
     it('agent start should get message', done => {
       app.process.send({
@@ -343,9 +333,7 @@ describe('test/lib/cluster/master.test.js', () => {
 
   describe('debug port', () => {
     let app;
-    afterEach(() => {
-      app.close();
-    });
+    afterEach(() => app.close());
 
     it('should set agent\'s debugPort', done => {
       app = utils.cluster('apps/agent-debug-port');
@@ -354,6 +342,22 @@ describe('test/lib/cluster/master.test.js', () => {
       .coverage(false)
       .expect('stdout', /debug port of agent is 5856/)
       .end(done);
+    });
+  });
+
+  describe('--sticky', () => {
+    before(() => {
+      app = utils.cluster('apps/cluster_mod_sticky', { sticky: true });
+      return app.ready();
+    });
+
+    after(() => app.close());
+
+    it('should online sticky cluster mode startup success', done => {
+      request(app.callback())
+      .get('/portal/i.htm')
+      .expect('hi cluster')
+      .expect(200, done);
     });
   });
 });
