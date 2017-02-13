@@ -1,4 +1,10 @@
 
+1.4.0 / 2017-02-13
+==================
+
+  * feat:add sticky cluster mode (#14)
+  * test: add test for agent debug port (#13)
+
 1.3.0 / 2017-01-20
 ==================
 
