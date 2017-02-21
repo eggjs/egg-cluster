@@ -48,6 +48,13 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
       .end(done);
     });
 
+    it('should exit when emit error during agent worker boot', done => {
+      app = utils.cluster('apps/agent-start-error');
+      app.debug(false)
+      .expect('code', 1)
+      .end(done);
+    });
+
     // process.send is not exist if started by spawn
     it('master should not die if spawn error', done => {
       app = coffee.spawn('node', [ utils.getFilepath('apps/agent-die/start.js') ]);

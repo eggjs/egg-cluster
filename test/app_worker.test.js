@@ -28,6 +28,25 @@ describe('test/lib/cluster/app_worker.test.js', () => {
     .end(done);
   });
 
+  it('should exit when emit error during app worker boot', function(done) {
+    app = utils.cluster('apps/app-start-error');
+    app.debug(false)
+    .expect('code', 1)
+    .end(done);
+  });
+
+  it('should remove error listener after ready', function* () {
+    app = utils.cluster('apps/app-error-listeners');
+    yield app.ready();
+    yield request(app.callback())
+    .get('/')
+    .expect({
+      beforeReady: 2,
+      afterReady: 1,
+    });
+    yield app.close();
+  });
+
   it('should ignore listen to other port', done => {
     app = utils.cluster('apps/other-port');
     app.notExpect('stdout', /started at 7002/).end(done);
