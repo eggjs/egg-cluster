@@ -2,11 +2,12 @@
 
 const mm = require('egg-mock');
 const request = require('supertest');
+const sleep = require('mz-modules/sleep');
 const utils = require('./utils');
 
 describe('test/lib/cluster/app_worker.test.js', () => {
-  let app;
 
+  let app;
   afterEach(() => app.close());
 
   describe('app worker', () => {
@@ -59,23 +60,25 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       app.debug(false);
       return app.ready();
     });
-    after(() => {
-      mm.restore();
-      app.close();
-    });
-    it('should restart', done => {
-      request(app.callback())
-      .get('/exit')
-      // wait app worker restart
-      .end(() => setTimeout(() => {
-        app.expect('stdout', /App Worker#1:\d+ disconnect/);
-        app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
-        app.expect('stderr', /App Worker#1:\d+ died/);
-        app.expect('stdout', /App Worker#2:\d+ started/);
+    after(mm.restore);
 
-        done();
+    it('should restart', function* () {
+      try {
+        yield request(app.callback())
+        .get('/exit')
+        // wait app worker restart
+        .end();
+      } catch (_) {
+        // ignore
+      }
+
       // wait to run coverage
-      }, 10000));
+      yield sleep(10000);
+
+      app.expect('stdout', /App Worker#1:\d+ disconnect/);
+      app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
+      app.expect('stderr', /App Worker#1:\d+ died/);
+      app.expect('stdout', /App Worker#2:\d+ started/);
     });
   });
 
@@ -87,19 +90,22 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       app.debug(false);
       return app.ready();
     });
-    after(() => {
-      mm.restore();
-      app.close();
-    });
-    it('should restart', done => {
-      request(app.callback())
-      .get('/exit')
-      // wait app worker restart
-      .end(() => setTimeout(() => {
-        app.expect('stdout', /App Worker#1:\d+ disconnect/);
-        app.expect('stderr', /don't fork new work/);
-        done();
-      }, 5000));
+    after(mm.restore);
+
+    it('should restart', function* () {
+      try {
+        yield request(app.callback())
+        .get('/exit')
+        // wait app worker restart
+        .end();
+      } catch (_) {
+        // ignore
+      }
+
+      yield sleep(5000);
+
+      app.expect('stdout', /App Worker#1:\d+ disconnect/);
+      app.expect('stderr', /don't fork new work/);
     });
   });
 
@@ -110,21 +116,24 @@ describe('test/lib/cluster/app_worker.test.js', () => {
       app.debug(false);
       return app.ready();
     });
-    after(() => {
-      mm.restore();
-      app.close();
-    });
-    it('should exit', done => {
-      request(app.callback())
-        .get('/kill?signal=SIGKILL')
-        // wait app worker restart
-        .end(() => setTimeout(() => {
-          app.expect('stdout', /App Worker#1:\d+ disconnect/);
-          app.expect('stderr', /Debugger listening on/);
-          app.expect('stderr', /don't fork new work/);
-          app.expect('stderr', /\[master\] kill by debugger/);
-          done();
-        }, 3000));
+    after(mm.restore);
+
+    it('should exit', function* () {
+      try {
+        yield request(app.callback())
+          .get('/kill?signal=SIGKILL')
+          // wait app worker restart
+          .end();
+      } catch (_) {
+        // ignore
+      }
+
+      yield sleep(3000);
+
+      app.expect('stdout', /App Worker#1:\d+ disconnect/);
+      app.expect('stderr', /Debugger listening on/);
+      app.expect('stderr', /don't fork new work/);
+      app.expect('stderr', /\[master\] kill by debugger/);
     });
   });
 

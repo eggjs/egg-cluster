@@ -12,9 +12,9 @@ module.exports = function(agent) {
   });
 
   // 发送给 app，要等 app 启动起来发送
-  setTimeout(function() {
-    agent.messenger.broadcast('agent2app', 'agent -> app');
-  }, 1000);
+  agent.messenger.on('egg-ready', () => {
+    agent.messenger.sendToApp('agent2app', 'agent -> app');
+  });
   agent.messenger.on('app2agent', msg => console.log(msg));
   agent.messenger.on('agent2appbystring', msg => console.log(msg));
 };
