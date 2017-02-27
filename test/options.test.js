@@ -8,21 +8,18 @@ const parseOptions = require('../lib/utils/options');
 const utils = require('./utils');
 
 
-describe('test/options.test.js', function() {
+describe.only('test/options.test.js', function() {
 
   afterEach(mm.restore);
 
   it('should start with http and listen 7001', function() {
-    const options = parseOptions({
-      customEgg: path.dirname(require.resolve('egg')),
-    });
+    const options = parseOptions({});
     assert(options.port === 7001);
   });
 
   it('should start with https and listen 8443', function() {
     const options = parseOptions({
       https: true,
-      customEgg: path.dirname(require.resolve('egg')),
       key: utils.getFilepath('server.key'),
       cert: utils.getFilepath('server.crt'),
     });
@@ -32,7 +29,6 @@ describe('test/options.test.js', function() {
   it('should listen custom port 6001', function() {
     const options = parseOptions({
       port: '6001',
-      customEgg: path.dirname(require.resolve('egg')),
     });
     assert(options.port === 6001);
   });
@@ -41,7 +37,6 @@ describe('test/options.test.js', function() {
     mm(process.env, 'NODE_ENV', 'production');
     const options = parseOptions({
       workers: 1,
-      customEgg: path.dirname(require.resolve('egg')),
     });
     assert(options.workers === 1);
     assert(process.env.NO_DEPRECATION === '*');
@@ -49,13 +44,11 @@ describe('test/options.test.js', function() {
 
   it('should not extend when port is null/undefined', function() {
     let options = parseOptions({
-      customEgg: path.dirname(require.resolve('egg')),
       port: null,
     });
     assert(options.port === 7001);
 
     options = parseOptions({
-      customEgg: path.dirname(require.resolve('egg')),
       port: undefined,
     });
     assert(options.port === 7001);
@@ -65,7 +58,6 @@ describe('test/options.test.js', function() {
     mm.syncError(os, 'cpus', 'should not call os.cpus');
     const options = parseOptions({
       workers: 1,
-      customEgg: path.dirname(require.resolve('egg')),
     });
     assert(options.workers === 1);
   });
@@ -75,6 +67,7 @@ describe('test/options.test.js', function() {
     before(() => {
       app = utils.cluster('apps/options', {
         foo: true,
+        framework: path.dirname(require.resolve('egg')),
       });
       return app.ready();
     });

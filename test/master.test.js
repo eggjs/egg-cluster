@@ -194,7 +194,7 @@ describe('test/lib/cluster/master.test.js', () => {
 
     before(() => {
       app = utils.cluster('apps/frameworkapp', {
-        customEgg: utils.getFilepath('apps/frameworkbiz'),
+        framework: utils.getFilepath('apps/frameworkbiz'),
       });
       return app.ready();
     });
