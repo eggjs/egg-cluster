@@ -36,7 +36,7 @@ $ npm i egg-cluster
 const startCluster = require('egg-cluster').startCluster;
 startCluster({
   baseDir: '/path/to/app',
-  customEgg: '/path/to/framework',
+  framework: '/path/to/framework',
 });
 ```
 
@@ -53,7 +53,7 @@ startCluster(options, () => {
 | Param     | Type      | Description              |
 | --------- | --------- | ------------------------ |
 | baseDir   | `String`  | directory of application |
-| customEgg | `String`  | directory of framework   |
+| framework | `String`  | specify framework that can be absolute path or npm package |
 | plugins   | `Object`  | plugins for unittest     |
 | workers   | `Number`  | numbers of app workers   |
 | sticky    | `Boolean` | sticky mode server       |
@@ -65,4 +65,3 @@ startCluster(options, () => {
 ## License
 
 [MIT](LICENSE)
-

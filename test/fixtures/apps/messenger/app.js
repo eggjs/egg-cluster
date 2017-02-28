@@ -12,7 +12,7 @@ module.exports = function(app) {
   });
 
   // 发送给 app
-  app.messenger.broadcast('app2agent', 'app -> agent');
+  app.messenger.sendToAgent('app2agent', 'app -> agent');
   app.messenger.on('agent2app', msg => console.log(msg));
 
   // 兼容 string

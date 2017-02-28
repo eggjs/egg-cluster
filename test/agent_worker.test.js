@@ -1,9 +1,11 @@
 
 'use strict';
 
-const fs = require('fs');
+const assert = require('assert');
 const path = require('path');
 const coffee = require('coffee');
+const fs = require('mz/fs');
+const sleep = require('mz-modules/sleep');
 const fixtures = path.join(__dirname, './fixtures');
 const utils = require('./utils');
 
@@ -22,21 +24,22 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
       .end(done);
     });
 
-    it('should refork after app start', done => {
+    it('should refork after app start', function* () {
       app = utils.cluster('apps/agent-die');
-      app.debug(false)
-      .end(function() {
-        app.process.send({
-          to: 'agent',
-          action: 'kill-agent',
-        });
-        setTimeout(() => {
-          this.expect('stdout', /Agent Worker restarting/);
-          this.expect('stdout', /app get agent-start/);
-          this.notExpect('stdout', /App Worker#2/);
-          done();
-        }, 8000);
+      yield app
+        .debug(false)
+        .end();
+
+      app.process.send({
+        to: 'agent',
+        action: 'kill-agent',
       });
+
+      yield sleep(8000);
+
+      app.expect('stdout', /Agent Worker restarting/);
+      app.expect('stdout', /app get agent-start/);
+      app.notExpect('stdout', /App Worker#2/);
     });
 
     it('should exit during app worker boot', done => {
@@ -56,15 +59,13 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
     });
 
     // process.send is not exist if started by spawn
-    it('master should not die if spawn error', done => {
+    it('master should not die if spawn error', function* () {
       app = coffee.spawn('node', [ utils.getFilepath('apps/agent-die/start.js') ]);
       app.close = () => app.proc.kill();
 
-      setTimeout(() => {
-        app.emit('close', 0);
-        app.notExpect('stderr', /TypeError: process.send is not a function/);
-        done();
-      }, 10000);
+      yield sleep(10000);
+      app.emit('close', 0);
+      app.notExpect('stderr', /TypeError: process.send is not a function/);
     });
   });
 
@@ -76,11 +77,10 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
 
     after(() => app.close());
 
-    it('should support custom logger in agent', done => {
-      setTimeout(() => {
-        fs.readFileSync(path.join(fixtures, 'apps/custom-logger/logs/monitor.log'), 'utf8').should.equal('hello monitor!\n');
-        done();
-      }, 1500);
+    it('should support custom logger in agent', function* () {
+      yield sleep(1500);
+      const content = yield fs.readFile(path.join(fixtures, 'apps/custom-logger/logs/monitor.log'), 'utf8');
+      assert(content === 'hello monitor!\n');
     });
   });
 });
