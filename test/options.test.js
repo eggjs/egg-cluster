@@ -8,7 +8,7 @@ const parseOptions = require('../lib/utils/options');
 const utils = require('./utils');
 
 
-describe.only('test/options.test.js', function() {
+describe('test/options.test.js', function() {
 
   afterEach(mm.restore);
 
