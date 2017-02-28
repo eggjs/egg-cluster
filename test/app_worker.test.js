@@ -65,14 +65,12 @@ describe('test/lib/cluster/app_worker.test.js', () => {
     it('should restart', function* () {
       try {
         yield request(app.callback())
-        .get('/exit')
-        // wait app worker restart
-        .end();
+        .get('/exit');
       } catch (_) {
         // ignore
       }
 
-      // wait to run coverage
+      // wait app worker restart
       yield sleep(10000);
 
       app.expect('stdout', /App Worker#1:\d+ disconnect/);
@@ -95,13 +93,12 @@ describe('test/lib/cluster/app_worker.test.js', () => {
     it('should restart', function* () {
       try {
         yield request(app.callback())
-        .get('/exit')
-        // wait app worker restart
-        .end();
+        .get('/exit');
       } catch (_) {
         // ignore
       }
 
+      // wait app worker restart
       yield sleep(5000);
 
       app.expect('stdout', /App Worker#1:\d+ disconnect/);
@@ -121,13 +118,12 @@ describe('test/lib/cluster/app_worker.test.js', () => {
     it('should exit', function* () {
       try {
         yield request(app.callback())
-          .get('/kill?signal=SIGKILL')
-          // wait app worker restart
-          .end();
+          .get('/kill?signal=SIGKILL');
       } catch (_) {
         // ignore
       }
 
+      // wait app worker restart
       yield sleep(3000);
 
       app.expect('stdout', /App Worker#1:\d+ disconnect/);
@@ -140,12 +136,14 @@ describe('test/lib/cluster/app_worker.test.js', () => {
   describe('app start timeout', () => {
     it('should exit', function(done) {
       app = utils.cluster('apps/app-start-timeout');
-      app.expect('code', 1)
-      .expect('stderr', /\[master\] worker start fail, exit now/)
-      .expect('stderr', /\[app_worker\] App Worker start timeout, exiting now!/)
-      .expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/)
-      .expect('stderr', /App Worker#1:\d+ died/)
-      .end(done);
+      app
+        .debug(false)
+        .expect('code', 1)
+        .expect('stderr', /\[master\] worker start fail, exit now/)
+        .expect('stderr', /\[app_worker\] App Worker start timeout, exiting now!/)
+        .expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/)
+        .expect('stderr', /App Worker#1:\d+ died/)
+        .end(done);
     });
   });
 

@@ -28,7 +28,7 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('start success in prod env', done => {
       mm.env('prod');
-      app = utils.cluster('apps/mock-production-app');
+      app = utils.cluster('apps/mock-production-app').debug(false);
 
       app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
@@ -194,7 +194,7 @@ describe('test/lib/cluster/master.test.js', () => {
 
     before(() => {
       app = utils.cluster('apps/frameworkapp', {
-        framework: utils.getFilepath('apps/frameworkbiz'),
+        customEgg: utils.getFilepath('apps/frameworkbiz'),
       });
       return app.ready();
     });
