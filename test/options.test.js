@@ -115,8 +115,8 @@ describe('test/options.test.js', function() {
         });
         throw new Error('should not run');
       } catch (err) {
-        const frameworkPath = path.join(__dirname, '../node_modules/noexist');
-        assert(err.message === `${frameworkPath} should exist`);
+        const frameworkPath = path.join(__dirname, '../node_modules');
+        assert(err.message === `noexist is not found in ${frameworkPath}`);
       }
     });
 
@@ -136,8 +136,11 @@ describe('test/options.test.js', function() {
         });
         throw new Error('should not run');
       } catch (err) {
-        const frameworkPath = path.join(baseDir, 'node_modules/noexist');
-        assert(err.message === `${frameworkPath} should exist`);
+        const frameworkPaths = [
+          path.join(baseDir, 'node_modules'),
+          path.join(process.cwd(), 'node_modules'),
+        ].join(',');
+        assert(err.message === `noexist is not found in ${frameworkPaths}`);
       }
     });
 
@@ -149,18 +152,6 @@ describe('test/options.test.js', function() {
       assert(options.framework === path.join(baseDir, 'node_modules/egg'));
     });
 
-    it('should get egg by default but not exist', () => {
-      const baseDir = path.join(__dirname, 'fixtures/apps/framework-egg-default-noexist');
-      try {
-        parseOptions({
-          baseDir,
-        });
-        throw new Error('should not run');
-      } catch (err) {
-        const frameworkPath = path.join(baseDir, 'node_modules/egg');
-        assert(err.message === `${frameworkPath} should exist`);
-      }
-    });
   });
 
   it('should exist when specify baseDir', () => {
