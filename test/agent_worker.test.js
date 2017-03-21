@@ -55,6 +55,7 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
       app = utils.cluster('apps/agent-start-error');
       app.debug(false)
       .expect('code', 1)
+      .expect('stderr', /mock error/)
       .end(done);
     });
 
