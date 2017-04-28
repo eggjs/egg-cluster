@@ -28,6 +28,7 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
       app = utils.cluster('apps/agent-die');
       yield app
         .debug(false)
+        .coverage(false)
         .end();
 
       app.process.send({
