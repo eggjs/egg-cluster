@@ -35,7 +35,7 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
         action: 'kill-agent',
       });
 
-      yield sleep(8000);
+      yield sleep(15000);
 
       app.expect('stdout', /Agent Worker restarting/);
       app.expect('stdout', /app get agent-start/);
