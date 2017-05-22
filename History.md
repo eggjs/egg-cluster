@@ -1,4 +1,12 @@
 
+1.6.3 / 2017-05-22
+==================
+
+  * fix: fix typo (#24)
+  * fix: start error should log what happend (#26)
+  * fix: fix deperated api (#25)
+  * deps: upgrade dependencies (#22)
+
 1.6.2 / 2017-03-22
 ==================
 
