@@ -20,10 +20,10 @@ describe('test/lib/cluster/master.test.js', () => {
       app = utils.cluster('apps/master-worker-started');
 
       app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('stdout', /\\"clusterPort\\":\d+/)
-      .expect('code', 0)
-      .end(done);
+        .expect('stdout', /egg started/)
+        .expect('stdout', /\\"clusterPort\\":\d+/)
+        .expect('code', 0)
+        .end(done);
     });
 
     it('start success in prod env', done => {
@@ -31,14 +31,14 @@ describe('test/lib/cluster/master.test.js', () => {
       app = utils.cluster('apps/mock-production-app').debug(false);
 
       app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end(err => {
-        assert.ifError(err);
-        console.log(app.stdout);
-        console.log(app.stderr);
-        done();
-      });
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end(err => {
+          assert.ifError(err);
+          console.log(app.stdout);
+          console.log(app.stderr);
+          done();
+        });
     });
   });
 
@@ -50,9 +50,9 @@ describe('test/lib/cluster/master.test.js', () => {
       app = utils.cluster('apps/master-worker-started');
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       app.proc.kill();
 
@@ -67,9 +67,9 @@ describe('test/lib/cluster/master.test.js', () => {
       app = utils.cluster('apps/master-worker-started');
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       app.proc.kill('SIGTERM');
       yield sleep(1000);
@@ -83,9 +83,9 @@ describe('test/lib/cluster/master.test.js', () => {
       app = utils.cluster('apps/master-worker-started');
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       app.proc.kill('SIGQUIT');
       yield sleep(1000);
@@ -181,9 +181,9 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('should online cluster mode startup success', done => {
       request(app.callback())
-      .get('/portal/i.htm')
-      .expect('hi cluster')
-      .expect(200, done);
+        .get('/portal/i.htm')
+        .expect('hi cluster')
+        .expect(200, done);
     });
   });
 
@@ -201,13 +201,13 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('should start with prod env', done => {
       request(app.callback())
-      .get('/')
-      .expect({
-        frameworkCore: true,
-        frameworkPlugin: true,
-        frameworkAgent: true,
-      })
-      .expect(200, done);
+        .get('/')
+        .expect({
+          frameworkCore: true,
+          frameworkPlugin: true,
+          frameworkAgent: true,
+        })
+        .expect(200, done);
     });
   });
 
@@ -321,9 +321,9 @@ describe('test/lib/cluster/master.test.js', () => {
       app = utils.cluster('apps/agent-debug-port');
 
       app
-      .coverage(false)
-      .expect('stdout', /debug port of agent is 5856/)
-      .end(done);
+        .coverage(false)
+        .expect('stdout', /debug port of agent is 5856/)
+        .end(done);
     });
   });
 
@@ -336,9 +336,23 @@ describe('test/lib/cluster/master.test.js', () => {
 
     it('should online sticky cluster mode startup success', done => {
       request(app.callback())
-      .get('/portal/i.htm')
-      .expect('hi cluster')
-      .expect(200, done);
+        .get('/portal/i.htm')
+        .expect('hi cluster')
+        .expect(200, done);
+    });
+  });
+
+  describe('--harmony', () => {
+    it('should set --harmony depending on node version', () => {
+      const app = utils.cluster('apps/app-harmony');
+      const v = Number(process.versions.modules);
+      return app
+        .expect('stdout', v < 48 ? /app with harmony/ : /app without harmony/)
+        .expect('stdout', v < 48 ? /agent with harmony/ : /agent without harmony/)
+        .end()
+        .then(() => {
+          return app.close();
+        });
     });
   });
 });
