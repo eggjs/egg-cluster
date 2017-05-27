@@ -7,7 +7,7 @@ const fs = require('mz/fs');
 const sleep = require('mz-modules/sleep');
 const utils = require('./utils');
 
-describe('test/lib/cluster/agent_worker.test.js', () => {
+describe('test/agent_worker.test.js', () => {
   let app;
 
   describe('Fork Agent', () => {
@@ -52,7 +52,7 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
       // kill -9 master
       app.process.kill('SIGKILL');
       yield sleep(5000);
-      app.expect('stdout', /\[app_worker\] receive disconnect event in cluster fork mode, exitedAfterDisconnect:false/)
+      app.expect('stderr', /\[app_worker\] receive disconnect event in cluster fork mode, exitedAfterDisconnect:false/)
         .expect('stderr', /\[agent_worker\] receive disconnect event on child_process fork mode, exiting with code:110/)
         .expect('stderr', /\[agent_worker\] exit with code:110/);
     });
@@ -65,7 +65,7 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
         .expect('stdout', /\[master\] agent_worker#1:\d+ started/)
         .expect('stderr', /\[master\] agent_worker#1:\d+ died/)
         .expect('stderr', /\[master\] agent_worker#1:\d+ start fail, exiting with code:1/)
-        .expect('stdout', /\[master\] exit with code:1/)
+        .expect('stderr', /\[master\] exit with code:1/)
         .notExpect('stdout', /app_worker#2/)
         .end();
     });
@@ -76,7 +76,7 @@ describe('test/lib/cluster/agent_worker.test.js', () => {
         .expect('code', 1)
         .expect('stderr', /mock error/)
         .expect('stderr', /\[agent_worker\] start error, exiting with code:1/)
-        .expect('stdout', /\[master\] exit with code:1/)
+        .expect('stderr', /\[master\] exit with code:1/)
         .end();
     });
 
