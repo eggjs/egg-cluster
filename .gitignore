@@ -6,3 +6,5 @@ run
 .tmp
 *.log
 .vscode
+.idea
+.DS_Store

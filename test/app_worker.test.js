@@ -3,6 +3,7 @@
 const mm = require('egg-mock');
 const sleep = require('mz-modules/sleep');
 const utils = require('./utils');
+const format = require('util').format;
 
 describe('test/app_worker.test.js', () => {
   let app;
@@ -142,6 +143,27 @@ describe('test/app_worker.test.js', () => {
         .expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/)
         .expect('stderr', /app_worker#1:\d+ died/)
         .end();
+    });
+  });
+
+  describe('app worker with appWorkBrk', () => {
+    it('should append execArgv to the app work', function(done) {
+      const brkConfig = [ '--debug-brk' ];
+      app = utils.cluster('apps/app-debug-brk', {
+        opt: { execArgv: [ '--debug' ] },
+        appWorkBrk: true,
+      });
+      const expectString = format(
+        'App Worker start with execArgv: %s', brkConfig);
+      let called = false;
+      app.on('stdout_data', function(buf) {
+        const out = buf.toString();
+        if (out.indexOf(expectString) > -1 && !called) {
+          called = true;
+          done();
+        }
+        // https://github.com/Microsoft/vscode/issues/5831
+      });
     });
   });
 
