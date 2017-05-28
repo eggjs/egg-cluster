@@ -7,17 +7,15 @@ const mm = require('egg-mock');
 const parseOptions = require('../lib/utils/options');
 const utils = require('./utils');
 
-
-describe('test/options.test.js', function() {
-
+describe('test/options.test.js', () => {
   afterEach(mm.restore);
 
-  it('should start with http and listen 7001', function() {
+  it('should start with http and listen 7001', () => {
     const options = parseOptions({});
     assert(options.port === 7001);
   });
 
-  it('should start with https and listen 8443', function() {
+  it('should start with https and listen 8443', () => {
     const options = parseOptions({
       https: true,
       key: utils.getFilepath('server.key'),
@@ -26,14 +24,14 @@ describe('test/options.test.js', function() {
     assert(options.port === 8443);
   });
 
-  it('should listen custom port 6001', function() {
+  it('should listen custom port 6001', () => {
     const options = parseOptions({
       port: '6001',
     });
     assert(options.port === 6001);
   });
 
-  it('should set NO_DEPRECATION on production env', function() {
+  it('should set NO_DEPRECATION on production env', () => {
     mm(process.env, 'NODE_ENV', 'production');
     const options = parseOptions({
       workers: 1,
@@ -42,7 +40,7 @@ describe('test/options.test.js', function() {
     assert(process.env.NO_DEPRECATION === '*');
   });
 
-  it('should not extend when port is null/undefined', function() {
+  it('should not extend when port is null/undefined', () => {
     let options = parseOptions({
       port: null,
     });
@@ -54,7 +52,7 @@ describe('test/options.test.js', function() {
     assert(options.port === 7001);
   });
 
-  it('should not call os.cpus when specify workers', function() {
+  it('should not call os.cpus when specify workers', () => {
     mm.syncError(os, 'cpus', 'should not call os.cpus');
     const options = parseOptions({
       workers: 1,
