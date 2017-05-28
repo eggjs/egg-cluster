@@ -1,4 +1,9 @@
 
+1.6.4 / 2017-05-28
+==================
+
+  * fix: agent should exit on disconnect event whatever master kill with SIGKILL (#27)
+
 1.6.3 / 2017-05-22
 ==================
 
