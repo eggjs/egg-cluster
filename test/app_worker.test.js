@@ -110,7 +110,7 @@ describe('test/app_worker.test.js', () => {
   describe('app worker kill when env === "local"', () => {
     before(() => {
       mm.env('local');
-      app = utils.cluster('apps/app-kill', { opt: { execArgv: [ '--debug' ] } });
+      app = utils.cluster('apps/app-kill');
       app.debug();
       return app.ready();
     });
@@ -125,7 +125,7 @@ describe('test/app_worker.test.js', () => {
       }
 
       // wait app worker restart
-      yield sleep(3000);
+      yield sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stderr', /Debugger listening on/);
