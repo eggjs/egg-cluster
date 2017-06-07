@@ -128,7 +128,6 @@ describe('test/app_worker.test.js', () => {
       yield sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
-      app.expect('stderr', /Debugger listening on/);
       app.expect('stderr', /don't fork new work/);
       app.expect('stderr', /\[master\] kill by debugger/);
     });
