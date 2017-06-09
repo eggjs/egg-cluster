@@ -20,37 +20,39 @@ describe('test/app_worker.test.js', () => {
     });
   });
 
-  it('should exit when app worker error during boot', () => {
-    app = utils.cluster('apps/worker-die');
+  describe('app worker error', () => {
+    it('should exit when app worker error during boot', () => {
+      app = utils.cluster('apps/worker-die');
 
-    return app.debug()
-    .expect('code', 1)
-    .end();
-  });
-
-  it('should exit when emit error during app worker boot', () => {
-    app = utils.cluster('apps/app-start-error');
-
-    return app.debug()
-    .expect('code', 1)
-    .end();
-  });
-
-  it('should remove error listener after ready', function* () {
-    app = utils.cluster('apps/app-error-listeners');
-    yield app.ready();
-    yield app.httpRequest()
-    .get('/')
-    .expect({
-      beforeReady: 2,
-      afterReady: 1,
+      return app.debug()
+      .expect('code', 1)
+      .end();
     });
-    yield app.close();
-  });
 
-  it('should ignore listen to other port', done => {
-    app = utils.cluster('apps/other-port');
-    app.notExpect('stdout', /started at 7002/).end(done);
+    it('should exit when emit error during app worker boot', () => {
+      app = utils.cluster('apps/app-start-error');
+
+      return app.debug()
+      .expect('code', 1)
+      .end();
+    });
+
+    it('should remove error listener after ready', function* () {
+      app = utils.cluster('apps/app-error-listeners');
+      yield app.ready();
+      yield app.httpRequest()
+      .get('/')
+      .expect({
+        beforeReady: 2,
+        afterReady: 1,
+      });
+      yield app.close();
+    });
+
+    it('should ignore listen to other port', done => {
+      app = utils.cluster('apps/other-port');
+      app.notExpect('stdout', /started at 7002/).end(done);
+    });
   });
 
   describe('app worker error in env === "default"', () => {
@@ -71,7 +73,7 @@ describe('test/app_worker.test.js', () => {
       }
 
       // wait app worker restart
-      yield sleep(10000);
+      yield sleep(15000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
@@ -98,7 +100,7 @@ describe('test/app_worker.test.js', () => {
       }
 
       // wait app worker restart
-      yield sleep(5000);
+      yield sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stderr', /don't fork new work/);
@@ -108,7 +110,7 @@ describe('test/app_worker.test.js', () => {
   describe('app worker kill when env === "local"', () => {
     before(() => {
       mm.env('local');
-      app = utils.cluster('apps/app-kill', { opt: { execArgv: [ '--debug' ] } });
+      app = utils.cluster('apps/app-kill');
       app.debug();
       return app.ready();
     });
@@ -123,12 +125,10 @@ describe('test/app_worker.test.js', () => {
       }
 
       // wait app worker restart
-      yield sleep(3000);
+      yield sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
-      app.expect('stderr', /Debugger listening on/);
       app.expect('stderr', /don't fork new work/);
-      app.expect('stderr', /\[master\] kill by debugger/);
     });
   });
 

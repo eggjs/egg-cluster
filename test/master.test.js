@@ -20,7 +20,7 @@ describe('test/master.test.js', () => {
 
       app.expect('stdout', /egg start/)
       .expect('stdout', /egg started/)
-      .expect('stdout', /\[master\] agent_worker#1:\d+ start with clusterPort:\d+/)
+      .notExpect('stdout', /\[master\] agent_worker#1:\d+ start with clusterPort:\d+/)
       .expect('code', 0)
       .end(done);
     });
@@ -66,7 +66,7 @@ describe('test/master.test.js', () => {
       yield sleep(1000);
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
-      app.expect('stdout', /\[master\] close done, exiting with code:0/);
+      app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
       app.expect('stdout', /\[master\] exit with code:0/);
       app.notExpect('stderr', /\[app_worker\] receive disconnect event /);
       app.notExpect('stderr', /\[agent_worker\] receive disconnect event /);
