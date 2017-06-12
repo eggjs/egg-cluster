@@ -1,4 +1,10 @@
 
+1.8.0 / 2017-06-12
+==================
+
+  * feat: use graceful-process to refactor app and agent worker (#30)
+  * test: sleep 20s to wait for agent process start (#29)
+
 1.7.0 / 2017-06-09
 ==================
 
