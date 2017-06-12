@@ -38,6 +38,7 @@
     "egg-logger": "^1.6.0",
     "egg-utils": "^2.2.0",
     "get-ready": "^2.0.1",
+    "graceful-process": "^1.0.0",
     "sendmessage": "^1.1.0"
   },
   "devDependencies": {
