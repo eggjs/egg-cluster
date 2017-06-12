@@ -34,7 +34,7 @@ describe('test/agent_worker.test.js', () => {
         action: 'kill-agent',
       });
 
-      yield sleep(15000);
+      yield sleep(20000);
 
       app.expect('stderr', /\[master\] agent_worker#1:\d+ died/);
       app.expect('stdout', /\[master\] try to start a new agent_worker after 1s .../);
