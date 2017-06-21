@@ -46,6 +46,9 @@ describe('test/master.test.js', () => {
 
     it('master will close agent and app worker', function* () {
       mm.env('local');
+      mm(process.env, 'EGG_APP_WORKER_LOGGER_LEVEL', 'INFO');
+      mm(process.env, 'EGG_AGENT_WORKER_LOGGER_LEVEL', 'INFO');
+      mm(process.env, 'EGG_MASTER_LOGGER_LEVEL', 'DEBUG');
       app = utils.cluster('apps/master-worker-started');
       app.debug();
 
@@ -61,15 +64,18 @@ describe('test/master.test.js', () => {
       // 2017-05-27 21:24:38,068 INFO 59067 [app_worker] exit with code:0
       // 2017-05-27 21:24:38,106 INFO 59066 [agent_worker] receive signal SIGTERM, exiting with code:0
       // 2017-05-27 21:24:38,107 INFO 59066 [agent_worker] exit with code:0
-      app.proc.kill();
-
+      app.proc.kill('SIGTERM');
       yield sleep(1000);
       assert(app.proc.killed === true);
-      app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
-      app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
-      app.expect('stdout', /\[master\] exit with code:0/);
-      app.notExpect('stderr', /\[app_worker\] receive disconnect event /);
-      app.notExpect('stderr', /\[agent_worker\] receive disconnect event /);
+      app.expect('stdout', /INFO \d+ \[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /DEBUG \d+ \[master\] close done, exiting with code:0/);
+      app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
+      // app.expect('stdout', /INFO \d+ \[app_worker\] receive signal SIGTERM, exiting with code:0/);
+      // app.expect('stdout', /INFO \d+ \[agent_worker\] receive signal SIGTERM, exiting with code:0/);
+      // app.notExpect('stderr', /\[app_worker\] receive disconnect event in cluster fork mode/);
+      // app.notExpect('stderr', /\[agent_worker\] receive disconnect event /);
+      app.expect('stdout', /INFO \d+ \[app_worker\] exit with code:0/);
+      app.expect('stdout', /INFO \d+ \[agent_worker\] exit with code:0/);
     });
 
     it('master kill by SIGKILL and agent, app worker exit too', function* () {
