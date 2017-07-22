@@ -4,6 +4,7 @@ const mm = require('egg-mock');
 const assert = require('assert');
 const pedding = require('pedding');
 const sleep = require('mz-modules/sleep');
+const request = require('supertest');
 const utils = require('./utils');
 
 describe('test/master.test.js', () => {
@@ -416,7 +417,8 @@ describe('test/master.test.js', () => {
     after(() => app.close());
 
     it('should online sticky cluster mode startup success', () => {
-      return app.httpRequest()
+      app.expect('stdout', /egg started on http:\/\/127.0.0.1:17010/);
+      return request('http://127.0.0.1:17010')
         .get('/portal/i.htm')
         .expect('hi cluster')
         .expect(200);

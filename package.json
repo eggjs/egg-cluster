@@ -43,6 +43,7 @@
     "sendmessage": "^1.1.0"
   },
   "devDependencies": {
+    "address": "^1.0.2",
     "autod": "^2.8.0",
     "coffee": "^4.1.0",
     "egg": "^1.6.1",
@@ -53,7 +54,8 @@
     "eslint-config-egg": "^5.0.0",
     "mz": "^2.6.0",
     "mz-modules": "^1.0.0",
-    "pedding": "^1.1.0"
+    "pedding": "^1.1.0",
+    "supertest": "^3.0.0"
   },
   "engines": {
     "node": ">= 6.0.0"

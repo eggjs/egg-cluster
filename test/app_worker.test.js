@@ -2,6 +2,10 @@
 
 const mm = require('egg-mock');
 const sleep = require('mz-modules/sleep');
+const rimraf = require('mz-modules/rimraf');
+const request = require('supertest');
+const address = require('address');
+const assert = require('assert');
 const utils = require('./utils');
 
 describe('test/app_worker.test.js', () => {
@@ -53,6 +57,7 @@ describe('test/app_worker.test.js', () => {
 
     it('should ignore listen to other port', done => {
       app = utils.cluster('apps/other-port');
+      // app.debug();
       app.notExpect('stdout', /started at 7002/).end(done);
     });
   });
@@ -145,6 +150,89 @@ describe('test/app_worker.test.js', () => {
         .expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/)
         .expect('stderr', /app_worker#1:\d+ died/)
         .end();
+    });
+  });
+
+  describe('listen config', () => {
+    const sockFile = utils.getFilepath('apps/app-listen-path/my.sock');
+    beforeEach(() => {
+      mm.env('default');
+    });
+    afterEach(mm.restore);
+    afterEach(() => rimraf(sockFile));
+
+    it('should error then port is not specified', function* () {
+      app = utils.cluster('apps/app-listen-without-port');
+      // app.debug();
+      yield app.ready();
+
+      app.expect('code', 1);
+      app.expect('stderr', /port should be number, but got undefined/);
+    });
+
+    it('should use port in config', function* () {
+      app = utils.cluster('apps/app-listen-port');
+      app.debug();
+      yield app.ready();
+
+      app.expect('code', 0);
+      app.expect('stdout', /egg started on http:\/\/127.0.0.1:17010/);
+
+      yield request('http://127.0.0.1:17010')
+        .get('/')
+        .expect('done')
+        .expect(200);
+
+      yield request('http://127.0.0.1:17010')
+        .get('/')
+        .expect('done')
+        .expect(200);
+
+      yield request('http://localhost:17010')
+        .get('/')
+        .expect('done')
+        .expect(200);
+    });
+
+    it('should use hostname in config', function* () {
+      const url = address.ip() + ':17010';
+
+      app = utils.cluster('apps/app-listen-hostname');
+      // app.debug();
+      yield app.ready();
+
+      app.expect('code', 0);
+      app.expect('stdout', new RegExp(`egg started on http://${url}`));
+
+      yield request(url)
+        .get('/')
+        .expect('done')
+        .expect(200);
+
+      try {
+        yield request('http://127.0.0.1:17010')
+          .get('/')
+          .expect('done')
+          .expect(200);
+        throw new Error('should not run');
+      } catch (err) {
+        assert(err.message === 'ECONNREFUSED: Connection refused');
+      }
+    });
+
+    it('should use path in config', function* () {
+      app = utils.cluster('apps/app-listen-path');
+      app.debug();
+      yield app.ready();
+
+      app.expect('code', 0);
+      app.expect('stdout', new RegExp(`egg started on ${sockFile}`));
+
+      const sock = encodeURIComponent(sockFile);
+      yield request(`http+unix://${sock}`)
+        .get('/')
+        .expect('done')
+        .expect(200);
     });
   });
 
