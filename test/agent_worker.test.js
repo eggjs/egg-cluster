@@ -15,7 +15,8 @@ describe('test/agent_worker.test.js', () => {
 
     it('should exist when error happened during boot', () => {
       app = utils.cluster('apps/agent-die-onboot');
-      return app.debug()
+      return app
+        // .debug()
         .expect('code', 1)
         .expect('stderr', /\[master\] agent_worker#1:\d+ start fail, exiting with code:1/)
         .expect('stderr', /error: app worker throw/)
@@ -25,7 +26,7 @@ describe('test/agent_worker.test.js', () => {
     it('should refork new agent_worker after app started', function* () {
       app = utils.cluster('apps/agent-die');
       yield app
-        .debug()
+        // .debug()
         .expect('stdout', /\[master\] egg started on http:\/\/127.0.0.1:\d+/)
         .end();
 
@@ -45,7 +46,7 @@ describe('test/agent_worker.test.js', () => {
     it('should exit agent_worker when master die in accident', function* () {
       app = utils.cluster('apps/agent-die');
       yield app
-        .debug()
+        // .debug()
         .expect('stdout', /\[master\] egg started on http:\/\/127.0.0.1:\d+/)
         .end();
 
@@ -60,7 +61,8 @@ describe('test/agent_worker.test.js', () => {
     it('should master exit when agent exit during app worker boot', () => {
       app = utils.cluster('apps/agent-die-on-forkapp');
 
-      return app.debug()
+      return app
+        // .debug()
         .expect('code', 1)
         .expect('stdout', /\[master\] agent_worker#1:\d+ started/)
         .expect('stderr', /\[master\] agent_worker#1:\d+ died/)
@@ -72,7 +74,8 @@ describe('test/agent_worker.test.js', () => {
 
     it('should exit when emit error during agent worker boot', () => {
       app = utils.cluster('apps/agent-start-error');
-      return app.debug()
+      return app
+        // .debug()
         .expect('code', 1)
         .expect('stderr', /mock error/)
         .expect('stderr', /\[agent_worker\] start error, exiting with code:1/)
@@ -83,7 +86,7 @@ describe('test/agent_worker.test.js', () => {
     // process.send is not exist if started by spawn
     it('master should not die if spawn error', function* () {
       app = coffee.spawn('node', [ utils.getFilepath('apps/agent-die/start.js') ]);
-      app.debug();
+      // app.debug();
       app.close = () => app.proc.kill();
 
       yield sleep(3000);

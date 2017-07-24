@@ -50,7 +50,7 @@ describe('test/master.test.js', () => {
       mm(process.env, 'EGG_AGENT_WORKER_LOGGER_LEVEL', 'INFO');
       mm(process.env, 'EGG_MASTER_LOGGER_LEVEL', 'DEBUG');
       app = utils.cluster('apps/master-worker-started');
-      app.debug();
+      // app.debug();
 
       yield app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
@@ -81,7 +81,7 @@ describe('test/master.test.js', () => {
     it('master kill by SIGKILL and agent, app worker exit too', function* () {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
-      app.debug();
+      // app.debug();
 
       yield app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
@@ -107,7 +107,7 @@ describe('test/master.test.js', () => {
     it('master kill by SIGKILL and exit multi workers', function* () {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started', { workers: 4 });
-      app.debug();
+      // app.debug();
 
       yield app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
@@ -133,7 +133,7 @@ describe('test/master.test.js', () => {
     it('use SIGTERM close master', function* () {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
-      app.debug();
+      // app.debug();
 
       yield app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
@@ -158,7 +158,7 @@ describe('test/master.test.js', () => {
     it('use SIGQUIT close master', function* () {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
-      app.debug();
+      // app.debug();
 
       yield app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
@@ -176,7 +176,7 @@ describe('test/master.test.js', () => {
     it('use SIGINT close master', function* () {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
-      app.debug();
+      // app.debug();
 
       yield app
         .expect('stdout', /egg start/)
@@ -198,7 +198,7 @@ describe('test/master.test.js', () => {
 
     it('parent -> app/agent', function* () {
       app = utils.cluster('apps/messenger');
-      app.debug();
+      // app.debug();
 
       yield app.end();
 
@@ -221,7 +221,7 @@ describe('test/master.test.js', () => {
     it('app/agent -> parent', done => {
       done = pedding(3, done);
       app = utils.cluster('apps/messenger');
-      app.debug();
+      // app.debug();
       app.end(done);
 
       setTimeout(() => {
@@ -234,7 +234,7 @@ describe('test/master.test.js', () => {
 
     it('should app <-> agent', function* () {
       app = utils.cluster('apps/messenger');
-      app.debug();
+      // app.debug();
       yield app.end();
 
       yield sleep(10000);
@@ -245,7 +245,7 @@ describe('test/master.test.js', () => {
 
     it('should send multi app worker', function* () {
       app = utils.cluster('apps/send-to-multiapp', { workers: 4 });
-      app.debug();
+      // app.debug();
       yield app.end();
       yield sleep(1000);
       app.expect('stdout', /\d+ 'got'/);
@@ -300,7 +300,7 @@ describe('test/master.test.js', () => {
       app = utils.cluster('apps/reload-worker', {
         workers: 4,
       });
-      app.debug();
+      // app.debug();
       return app.ready();
     });
 
@@ -322,7 +322,7 @@ describe('test/master.test.js', () => {
 
     before(() => {
       app = utils.cluster('apps/egg-ready');
-      app.debug();
+      // app.debug();
       return app.ready();
     });
 
@@ -340,7 +340,7 @@ describe('test/master.test.js', () => {
       mm.env('default');
       app = utils.cluster('apps/pid', { workers: 2 });
       app.coverage(false);
-      app.debug();
+      // app.debug();
       return app.ready();
     });
     after(() => app.close());
@@ -375,7 +375,7 @@ describe('test/master.test.js', () => {
       mm.env('default');
       app = utils.cluster('apps/pid');
       app.coverage(false);
-      app.debug();
+      // app.debug();
       return app.ready();
     });
     after(() => app.close());
@@ -399,7 +399,8 @@ describe('test/master.test.js', () => {
     it('should set agent\'s debugPort', done => {
       app = utils.cluster('apps/agent-debug-port');
 
-      app.debug()
+      app
+        // .debug()
         .coverage(false)
         .expect('stdout', /debug port of agent is 5856/)
         .end(done);
@@ -409,7 +410,7 @@ describe('test/master.test.js', () => {
   describe('--sticky', () => {
     before(() => {
       app = utils.cluster('apps/cluster_mod_sticky', { sticky: true });
-      app.debug();
+      // app.debug();
       return app.ready();
     });
     after(() => app.close());

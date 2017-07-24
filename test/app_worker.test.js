@@ -24,7 +24,8 @@ describe('test/app_worker.test.js', () => {
     it('should exit when app worker error during boot', () => {
       app = utils.cluster('apps/worker-die');
 
-      return app.debug()
+      return app
+        // .debug()
         .expect('code', 1)
         .end();
     });
@@ -32,7 +33,8 @@ describe('test/app_worker.test.js', () => {
     it('should exit when emit error during app worker boot', () => {
       app = utils.cluster('apps/app-start-error');
 
-      return app.debug()
+      return app
+        // .debug()
         .expect('code', 1)
         .end();
     });
@@ -59,7 +61,7 @@ describe('test/app_worker.test.js', () => {
     before(() => {
       mm.env('default');
       app = utils.cluster('apps/app-die');
-      app.debug();
+      // app.debug();
       return app.ready();
     });
     after(mm.restore);
@@ -86,7 +88,7 @@ describe('test/app_worker.test.js', () => {
     before(() => {
       mm.env('local');
       app = utils.cluster('apps/app-die');
-      app.debug();
+      // app.debug();
       return app.ready();
     });
     after(mm.restore);
@@ -111,7 +113,7 @@ describe('test/app_worker.test.js', () => {
     before(() => {
       mm.env('local');
       app = utils.cluster('apps/app-kill');
-      app.debug();
+      // app.debug();
       return app.ready();
     });
     after(mm.restore);
@@ -135,7 +137,8 @@ describe('test/app_worker.test.js', () => {
   describe('app start timeout', () => {
     it('should exit', () => {
       app = utils.cluster('apps/app-start-timeout');
-      return app.debug()
+      return app
+        // .debug()
         .expect('code', 1)
         .expect('stderr', /\[master\] app_worker#1:\d+ start fail, exiting with code:1/)
         .expect('stderr', /\[app_worker\] start timeout, exiting with code:1/)
