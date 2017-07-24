@@ -4,16 +4,17 @@
   "description": "cluster manager for egg",
   "main": "index.js",
   "scripts": {
+    "autod": "autod",
+    "lint": "eslint .",
     "test": "npm run lint && npm run test-local",
     "test-local": "egg-bin test",
     "cov": "egg-bin cov --prerequire --timeout 100000",
-    "lint": "eslint --ext js . --fix",
-    "ci": "npm run lint && npm run cov",
-    "autod": "autod"
+    "ci": "npm run lint && egg-bin pkgfiles --check && npm run cov",
+    "pkgfiles": "egg-bin pkgfiles"
   },
   "files": [
-    "lib",
-    "index.js"
+    "index.js",
+    "lib"
   ],
   "repository": {
     "type": "git",
