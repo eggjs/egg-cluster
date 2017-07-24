@@ -19,10 +19,10 @@ describe('test/master.test.js', () => {
       app = utils.cluster('apps/master-worker-started');
 
       app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .notExpect('stdout', /\[master\] agent_worker#1:\d+ start with clusterPort:\d+/)
-      .expect('code', 0)
-      .end(done);
+        .expect('stdout', /egg started/)
+        .notExpect('stdout', /\[master\] agent_worker#1:\d+ start with clusterPort:\d+/)
+        .expect('code', 0)
+        .end(done);
     });
 
     it('start success in prod env', done => {
@@ -30,14 +30,14 @@ describe('test/master.test.js', () => {
       app = utils.cluster('apps/mock-production-app').debug(false);
 
       app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end(err => {
-        assert.ifError(err);
-        console.log(app.stdout);
-        console.log(app.stderr);
-        done();
-      });
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end(err => {
+          assert.ifError(err);
+          console.log(app.stdout);
+          console.log(app.stderr);
+          done();
+        });
     });
   });
 
@@ -53,9 +53,9 @@ describe('test/master.test.js', () => {
       app.debug();
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       // 2017-05-27 21:24:38,064 INFO 59065 [master] receive signal SIGTERM, closing
       // 2017-05-27 21:24:38,065 INFO 59065 [master] close done, exiting with code:0
@@ -84,9 +84,9 @@ describe('test/master.test.js', () => {
       app.debug();
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       // 2017-05-28 00:08:19,047 INFO 59500 [master] egg started on http://127.0.0.1:17001 (2364ms)
       // 2017-05-28 00:08:19,058 ERROR 59502 [app_worker] receive disconnect event in cluster fork mode, exitedAfterDisconnect:false
@@ -110,9 +110,9 @@ describe('test/master.test.js', () => {
       app.debug();
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       // 2017-05-28 00:08:19,047 INFO 59500 [master] egg started on http://127.0.0.1:17001 (2364ms)
       // 2017-05-28 00:08:19,058 ERROR 59502 [app_worker] receive disconnect event in cluster fork mode, exitedAfterDisconnect:false
@@ -136,9 +136,9 @@ describe('test/master.test.js', () => {
       app.debug();
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       // 2017-05-28 00:14:32,982 INFO 59714 [master] egg started on http://127.0.0.1:17001 (1606ms)
       // 2017-05-28 00:14:32,987 INFO 59714 [master] receive signal SIGTERM, closing
@@ -161,9 +161,9 @@ describe('test/master.test.js', () => {
       app.debug();
 
       yield app.expect('stdout', /egg start/)
-      .expect('stdout', /egg started/)
-      .expect('code', 0)
-      .end();
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
 
       app.proc.kill('SIGQUIT');
       yield sleep(1000);

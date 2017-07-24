@@ -15,8 +15,8 @@ describe('test/app_worker.test.js', () => {
     });
     it('should emit `server`', () => {
       return app.httpRequest()
-      .get('/')
-      .expect('true');
+        .get('/')
+        .expect('true');
     });
   });
 
@@ -25,27 +25,27 @@ describe('test/app_worker.test.js', () => {
       app = utils.cluster('apps/worker-die');
 
       return app.debug()
-      .expect('code', 1)
-      .end();
+        .expect('code', 1)
+        .end();
     });
 
     it('should exit when emit error during app worker boot', () => {
       app = utils.cluster('apps/app-start-error');
 
       return app.debug()
-      .expect('code', 1)
-      .end();
+        .expect('code', 1)
+        .end();
     });
 
     it('should remove error listener after ready', function* () {
       app = utils.cluster('apps/app-error-listeners');
       yield app.ready();
       yield app.httpRequest()
-      .get('/')
-      .expect({
-        beforeReady: 2,
-        afterReady: 1,
-      });
+        .get('/')
+        .expect({
+          beforeReady: 2,
+          afterReady: 1,
+        });
       yield app.close();
     });
 
@@ -67,7 +67,7 @@ describe('test/app_worker.test.js', () => {
     it('should restart', function* () {
       try {
         yield app.httpRequest()
-        .get('/exit');
+          .get('/exit');
       } catch (_) {
         // ignore
       }
@@ -94,7 +94,7 @@ describe('test/app_worker.test.js', () => {
     it('should restart', function* () {
       try {
         yield app.httpRequest()
-        .get('/exit');
+          .get('/exit');
       } catch (_) {
         // ignore
       }
