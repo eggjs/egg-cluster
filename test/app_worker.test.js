@@ -172,13 +172,13 @@ describe('test/app_worker.test.js', () => {
 
     it('should use port in config', function* () {
       app = utils.cluster('apps/app-listen-port');
-      app.debug();
+      // app.debug();
       yield app.ready();
 
       app.expect('code', 0);
       app.expect('stdout', /egg started on http:\/\/127.0.0.1:17010/);
 
-      yield request('http://127.0.0.1:17010')
+      yield request('http://0.0.0.0:17010')
         .get('/')
         .expect('done')
         .expect(200);
@@ -191,6 +191,11 @@ describe('test/app_worker.test.js', () => {
       yield request('http://localhost:17010')
         .get('/')
         .expect('done')
+        .expect(200);
+
+      yield request('http://127.0.0.1:17010')
+        .get('/port')
+        .expect('17010')
         .expect(200);
     });
 
