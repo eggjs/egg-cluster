@@ -227,7 +227,7 @@ describe('test/app_worker.test.js', () => {
 
     it('should use path in config', function* () {
       app = utils.cluster('apps/app-listen-path');
-      app.debug();
+      // app.debug();
       yield app.ready();
 
       app.expect('code', 0);
