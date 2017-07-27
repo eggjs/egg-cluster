@@ -167,7 +167,7 @@ describe('test/app_worker.test.js', () => {
       yield app.ready();
 
       app.expect('code', 1);
-      app.expect('stderr', /port should be number, but got undefined/);
+      app.expect('stderr', /port should be number, but got null/);
     });
 
     it('should use port in config', function* () {
