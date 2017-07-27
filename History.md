@@ -1,4 +1,13 @@
 
+1.9.0 / 2017-07-27
+==================
+
+  * feat: add listen config (#34)
+  * refactor: disable console (#36)
+  * deps: upgrade eslint (#35)
+  * refactor: set agent worker and app worker console level (#33)
+  * deps: upgrade dependencies (#32)
+
 1.8.0 / 2017-06-12
 ==================
 
