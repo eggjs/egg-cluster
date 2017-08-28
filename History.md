@@ -1,4 +1,10 @@
 
+1.9.1 / 2017-08-28
+==================
+
+  * fix: sleep 100ms to make sure SIGTERM send to the child processes (#37)
+  * test: fix test that should mock the default port (#38)
+
 1.9.0 / 2017-07-27
 ==================
 
