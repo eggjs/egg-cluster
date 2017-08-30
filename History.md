@@ -1,4 +1,10 @@
 
+1.9.2 / 2017-08-30
+==================
+
+**fixes**
+  * [[`7277b00`](http://github.com/eggjs/egg-cluster/commit/7277b00516905f0e26c78c063b7f84044c069b6d)] - fix: debug status detect should support inspect (#39) (TZ | 天猪 <<atian25@qq.com>>)
+
 1.9.1 / 2017-08-28
 ==================
 
