@@ -10,9 +10,9 @@ const utils = require('./utils');
 describe('test/options.test.js', () => {
   afterEach(mm.restore);
 
-  it('should start with http and listen 7001', () => {
+  it('should return undefined by port as default', () => {
     const options = parseOptions({});
-    assert(options.port === 7001);
+    assert(options.port === undefined);
   });
 
   it('should start with https and listen 8443', () => {
