@@ -44,12 +44,12 @@ describe('test/options.test.js', () => {
     let options = parseOptions({
       port: null,
     });
-    assert(options.port === 7001);
+    assert(options.port === undefined);
 
     options = parseOptions({
       port: undefined,
     });
-    assert(options.port === 7001);
+    assert(options.port === undefined);
   });
 
   it('should not call os.cpus when specify workers', () => {
