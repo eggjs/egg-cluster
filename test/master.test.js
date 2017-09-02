@@ -397,14 +397,71 @@ describe('test/master.test.js', () => {
     let app;
     afterEach(() => app.close());
 
-    it('should set agent\'s debugPort', done => {
-      app = utils.cluster('apps/agent-debug-port');
+    // 6.x: Debugger listening on [::]:5858
+    // 8.x: Debugger listening on ws://127.0.0.1:9229/221caad4-e2d0-4630-b0bb-f7fb27b81ff6
 
-      app
+    it('debug = true', () => {
+      app = utils.cluster('apps/debug-port', { debug: true });
+
+      return app
         // .debug()
-        .coverage(false)
-        .expect('stdout', /debug port of agent is 5856/)
-        .end(done);
+        .expect('stderr', /Debugger listening on .*:(5858|9229)/)
+        .expect('stdout', /debug port of app is (5858|9229)/)
+        .end();
+    });
+
+    it('debug = 9999', () => {
+      app = utils.cluster('apps/debug-port', { debug: 9999 });
+
+      return app
+        // .debug()
+        .expect('stderr', /Debugger listening on .*:9999/)
+        .expect('stdout', /debug port of app is 9999/)
+        .end();
+    });
+
+    it('debugAgent = true', () => {
+      app = utils.cluster('apps/debug-port', { debugAgent: true });
+
+      return app
+        // .debug()
+        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
+        .expect('stdout', /debug port of agent is (5856|9227)/)
+        .end();
+    });
+
+    it('debugAgent = 9999', () => {
+      app = utils.cluster('apps/debug-port', { debugAgent: 9999 });
+
+      return app
+        // .debug()
+        .expect('stderr', /Debugger listening on .*:9999/)
+        .expect('stdout', /debug port of agent is 9999/)
+        .end();
+    });
+
+    it('debug = true, debugAgent = true', () => {
+      app = utils.cluster('apps/debug-port', { debug: true, debugAgent: true });
+
+      return app
+        // .debug()
+        .expect('stderr', /Debugger listening on .*:(5858|9229)/)
+        .expect('stdout', /debug port of app is (5858|9229)/)
+        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
+        .expect('stdout', /debug port of agent is (5856|9227)/)
+        .end();
+    });
+
+    it('debug = 9999, debugAgent = true', () => {
+      app = utils.cluster('apps/debug-port', { debug: 9999, debugAgent: true });
+
+      return app
+        // .debug()
+        .expect('stderr', /Debugger listening on .*:9999/)
+        .expect('stdout', /debug port of app is 9999/)
+        .expect('stderr', /Debugger listening on .*:9997/)
+        .expect('stdout', /debug port of agent is 9997/)
+        .end();
     });
   });
 

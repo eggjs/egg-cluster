@@ -165,4 +165,58 @@ describe('test/options.test.js', () => {
       }
     });
   });
+
+  describe('debug', () => {
+    it('debug = true', () => {
+      const options = parseOptions({
+        debug: true,
+      });
+      assert(options.debug === 9229 || options.debug === 5858);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debug = 9999', () => {
+      const options = parseOptions({
+        debug: 9999,
+      });
+      assert(options.debug === 9999);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debugAgent = true', () => {
+      const options = parseOptions({
+        debugAgent: true,
+      });
+      assert(options.debugAgent === 9227 || options.debugAgent === 5856);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debugAgent = 9999', () => {
+      const options = parseOptions({
+        debugAgent: 9999,
+      });
+      assert(options.debugAgent === 9999);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debug = 5000, debugAgent = true', () => {
+      const options = parseOptions({
+        debug: 5002,
+        debugAgent: true,
+      });
+      assert(options.debug === 5002);
+      assert(options.debugAgent === 5000);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debug = 5000, debugAgent = 9999', () => {
+      const options = parseOptions({
+        debug: 5002,
+        debugAgent: 9999,
+      });
+      assert(options.debug === 5002);
+      assert(options.debugAgent === 9999);
+      assert(options.debugProtocol !== undefined);
+    });
+  });
 });

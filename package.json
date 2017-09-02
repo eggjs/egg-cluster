@@ -40,6 +40,7 @@
     "egg-utils": "^2.2.0",
     "get-ready": "^2.0.1",
     "graceful-process": "^1.0.0",
+    "semver": "^5.4.1",
     "sendmessage": "^1.1.0"
   },
   "devDependencies": {
