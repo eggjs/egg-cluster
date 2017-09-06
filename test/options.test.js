@@ -181,6 +181,7 @@ describe('test/options.test.js', () => {
       });
       assert(options.debug === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
     });
 
     it('debugBrk = true', () => {
@@ -199,6 +200,8 @@ describe('test/options.test.js', () => {
       assert(options.debugBrk === true);
       assert(options.debug === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.appExecArgv[1] === `--${options.debugProtocol}-brk`);
     });
 
     it('debug = 9999, debugBrk = 1234', () => {
@@ -210,6 +213,8 @@ describe('test/options.test.js', () => {
       assert(options.debugBrk === true);
       assert(options.debug === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.appExecArgv[1] === `--${options.debugProtocol}-brk`);
     });
 
     it('debug = 9999, debugBrk = true', () => {
@@ -221,6 +226,8 @@ describe('test/options.test.js', () => {
       assert(options.debugBrk === true);
       assert(options.debug === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.appExecArgv[1] === `--${options.debugProtocol}-brk`);
     });
 
     // ==== agent ====
@@ -239,6 +246,7 @@ describe('test/options.test.js', () => {
       });
       assert(options.debugAgent === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
     });
 
     it('debugAgentBrk = true', () => {
@@ -257,6 +265,8 @@ describe('test/options.test.js', () => {
       assert(options.debugAgentBrk === true);
       assert(options.debugAgent === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.agentExecArgv[1] === `--${options.debugProtocol}-brk`);
     });
 
     it('debugAgent = 9999, debugAgentBrk = 1234', () => {
@@ -268,6 +278,8 @@ describe('test/options.test.js', () => {
       assert(options.debugAgentBrk === true);
       assert(options.debugAgent === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.agentExecArgv[1] === `--${options.debugProtocol}-brk`);
     });
 
     it('debugAgent = 9999, debugAgentBrk = true', () => {
@@ -279,6 +291,8 @@ describe('test/options.test.js', () => {
       assert(options.debugAgentBrk === true);
       assert(options.debugAgent === 9999);
       assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.agentExecArgv[1] === `--${options.debugProtocol}-brk`);
     });
 
     // ==== both ====
