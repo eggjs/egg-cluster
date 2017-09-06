@@ -363,9 +363,9 @@ describe('test/master.test.js', () => {
       }
 
       yield sleep(9000);
-      // 一个 worker 挂了
+      // oh, one worker dead
       app.expect('stdout', /#3 agent get 1 workers \[ \d+ \]/);
-      // 又启动了一个 worker
+      // never mind, fork new worker
       app.expect('stdout', /#4 agent get 2 workers \[ \d+, \d+ \]/);
     });
   });
@@ -464,8 +464,8 @@ describe('test/master.test.js', () => {
         .end();
     });
 
-    it('debug = true, debugBrk = true', done => {
-      app = utils.cluster('apps/debug-port', { debug: true, debugBrk: true });
+    it('debugBrk = true', done => {
+      app = utils.cluster('apps/debug-port', { debugBrk: true });
 
       app
         // .debug()
@@ -476,11 +476,11 @@ describe('test/master.test.js', () => {
       setTimeout(() => {
         console.log('exit');
         app.close();
-      }, 3000);
+      }, 5000);
     });
 
-    it('debugAgent = true, debugAgentBrk = true', done => {
-      app = utils.cluster('apps/debug-port', { debugAgent: true, debugAgentBrk: true });
+    it('debugAgentBrk = true', done => {
+      app = utils.cluster('apps/debug-port', { debugAgentBrk: true });
 
       app
         // .debug()
@@ -493,7 +493,7 @@ describe('test/master.test.js', () => {
       setTimeout(() => {
         console.log('exit');
         app.close();
-      }, 3000);
+      }, 5000);
     });
   });
 
