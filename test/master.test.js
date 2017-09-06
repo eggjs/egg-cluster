@@ -463,6 +463,38 @@ describe('test/master.test.js', () => {
         .expect('stdout', /debug port of agent is 9997/)
         .end();
     });
+
+    it('debug = true, debugBrk = true', done => {
+      app = utils.cluster('apps/debug-port', { debug: true, debugBrk: true });
+
+      app
+        // .debug()
+        .expect('stderr', /Debugger listening on .*:(5858|9229)/)
+        .notExpect('stdout', /\[master] egg started on http:\/\/127.0.0.1/)
+        .end(done);
+
+      setTimeout(() => {
+        console.log('exit');
+        app.close();
+      }, 3000);
+    });
+
+    it('debugAgent = true, debugAgentBrk = true', done => {
+      app = utils.cluster('apps/debug-port', { debugAgent: true, debugAgentBrk: true });
+
+      app
+        // .debug()
+        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
+        .notExpect('stdout', /\[master] egg started on http:\/\/127.0.0.1/)
+        .notExpect('stdout', /\agent_worker#1:\d+ started/)
+        .notExpect('stdout', /start appWorker/)
+        .end(done);
+
+      setTimeout(() => {
+        console.log('exit');
+        app.close();
+      }, 3000);
+    });
   });
 
   describe('--sticky', () => {
