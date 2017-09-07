@@ -1,6 +1,6 @@
 {
   "name": "egg-cluster",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "cluster manager for egg",
   "main": "index.js",
   "scripts": {
@@ -40,6 +40,7 @@
     "egg-utils": "^2.2.0",
     "get-ready": "^2.0.1",
     "graceful-process": "^1.0.0",
+    "semver": "^5.4.1",
     "sendmessage": "^1.1.0"
   },
   "devDependencies": {
