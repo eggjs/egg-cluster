@@ -165,4 +165,156 @@ describe('test/options.test.js', () => {
       }
     });
   });
+
+  describe('debug', () => {
+    it('debug = true', () => {
+      const options = parseOptions({
+        debug: true,
+      });
+      assert(options.debug === 9229 || options.debug === 5858);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debug = 9999', () => {
+      const options = parseOptions({
+        debug: 9999,
+      });
+      assert(options.debug === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
+    });
+
+    it('debugBrk = true', () => {
+      const options = parseOptions({
+        debugBrk: true,
+      });
+      assert(options.debugBrk === true);
+      assert(options.debug === 9229 || options.debug === 5858);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debugBrk = 9999', () => {
+      const options = parseOptions({
+        debugBrk: 9999,
+      });
+      assert(options.debugBrk === true);
+      assert(options.debug === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.appExecArgv[1] === `--${options.debugProtocol}-brk`);
+    });
+
+    it('debug = 9999, debugBrk = 1234', () => {
+      // only use debug's port
+      const options = parseOptions({
+        debug: 9999,
+        debugBrk: 1234,
+      });
+      assert(options.debugBrk === true);
+      assert(options.debug === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.appExecArgv[1] === `--${options.debugProtocol}-brk`);
+    });
+
+    it('debug = 9999, debugBrk = true', () => {
+      // only use debug's port
+      const options = parseOptions({
+        debug: 9999,
+        debugBrk: true,
+      });
+      assert(options.debugBrk === true);
+      assert(options.debug === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.appExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.appExecArgv[1] === `--${options.debugProtocol}-brk`);
+    });
+
+    // ==== agent ====
+
+    it('debugAgent = true', () => {
+      const options = parseOptions({
+        debugAgent: true,
+      });
+      assert(options.debugAgent === 9227 || options.debugAgent === 5856);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debugAgent = 9999', () => {
+      const options = parseOptions({
+        debugAgent: 9999,
+      });
+      assert(options.debugAgent === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
+    });
+
+    it('debugAgentBrk = true', () => {
+      const options = parseOptions({
+        debugAgentBrk: true,
+      });
+      assert(options.debugAgentBrk === true);
+      assert(options.debugAgent === 9227 || options.debugAgent === 5856);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debugAgentBrk = 9999', () => {
+      const options = parseOptions({
+        debugAgentBrk: 9999,
+      });
+      assert(options.debugAgentBrk === true);
+      assert(options.debugAgent === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.agentExecArgv[1] === `--${options.debugProtocol}-brk`);
+    });
+
+    it('debugAgent = 9999, debugAgentBrk = 1234', () => {
+      // only use debugAgent's port
+      const options = parseOptions({
+        debugAgent: 9999,
+        debugAgentBrk: 1234,
+      });
+      assert(options.debugAgentBrk === true);
+      assert(options.debugAgent === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.agentExecArgv[1] === `--${options.debugProtocol}-brk`);
+    });
+
+    it('debugAgent = 9999, debugAgentBrk = true', () => {
+      // only use debug's port
+      const options = parseOptions({
+        debugAgent: 9999,
+        debugAgentBrk: true,
+      });
+      assert(options.debugAgentBrk === true);
+      assert(options.debugAgent === 9999);
+      assert(options.debugProtocol !== undefined);
+      assert(options.agentExecArgv[0] === `--${options.debugProtocol}=9999`);
+      assert(options.agentExecArgv[1] === `--${options.debugProtocol}-brk`);
+    });
+
+    // ==== both ====
+
+    it('debug = 5000, debugAgent = true', () => {
+      const options = parseOptions({
+        debug: 5002,
+        debugAgent: true,
+      });
+      assert(options.debug === 5002);
+      assert(options.debugAgent === 5000);
+      assert(options.debugProtocol !== undefined);
+    });
+
+    it('debug = 5000, debugAgent = 9999', () => {
+      const options = parseOptions({
+        debug: 5002,
+        debugAgent: 9999,
+      });
+      assert(options.debug === 5002);
+      assert(options.debugAgent === 9999);
+      assert(options.debugProtocol !== undefined);
+    });
+  });
 });
