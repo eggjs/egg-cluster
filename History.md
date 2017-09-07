@@ -1,4 +1,10 @@
 
+1.10.0 / 2017-09-07
+==================
+
+**others**
+  * [[`0561ce7`](http://github.com/eggjs/egg-cluster/commit/0561ce7bd69151dd66b1e24352f4f0b632591a39)] - refactor: support debug options (#41) (TZ | 天猪 <<atian25@qq.com>>)
+
 1.9.2 / 2017-08-30
 ==================
 
