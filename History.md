@@ -1,4 +1,15 @@
 
+1.11.0 / 2017-09-08
+==================
+
+**features**
+  * [[`49bd949`](http://github.com/eggjs/egg-cluster/commit/49bd949a5271f0db86de6c4111fefbd6613017e1)] - feat: delete default port options that has defined in egg (#40) (Haoliang Gao <<sakura9515@gmail.com>>)
+
+**others**
+  * [[`0561ce7`](http://github.com/eggjs/egg-cluster/commit/0561ce7bd69151dd66b1e24352f4f0b632591a39)] - refactor: support debug options (#41) (TZ | 天猪 <<atian25@qq.com>>)
+ * [new tag]         1.10.0     -> 1.10.0
+
+
 1.10.0 / 2017-09-07
 ==================
 
