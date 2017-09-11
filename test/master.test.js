@@ -532,8 +532,8 @@ describe('test/master.test.js', () => {
         // .debug()
         .expect('stderr', /Debugger listening on .*:9999/)
         .expect('stdout', /debug port of app is 9999/)
-        .expect('stderr', /Debugger listening on .*:9997/)
-        .expect('stdout', /debug port of agent is 9997/)
+        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
+        .expect('stdout', /debug port of agent is (5856|9227)/)
         .end();
     });
 
