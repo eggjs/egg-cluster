@@ -303,7 +303,7 @@ describe('test/options.test.js', () => {
         debugAgent: true,
       });
       assert(options.debug === 5002);
-      assert(options.debugAgent === 5000);
+      assert(options.debugAgent === 9227 || options.debugAgent === 5856);
       assert(options.debugProtocol !== undefined);
     });
 
