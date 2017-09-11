@@ -1,4 +1,10 @@
 
+1.11.1 / 2017-09-11
+==================
+
+**fixes**
+  * [[`8d46f20`](http://github.com/eggjs/egg-cluster/commit/8d46f20c04967647a1991736d2db2db0202790a2)] - fix: only set options.debugProtocol at debug mode (#42) (TZ | 天猪 <<atian25@qq.com>>)
+
 1.11.0 / 2017-09-08
 ==================
 
