@@ -5,6 +5,7 @@ const assert = require('assert');
 const pedding = require('pedding');
 const sleep = require('mz-modules/sleep');
 const request = require('supertest');
+const semver = require('semver');
 const utils = require('./utils');
 
 describe('test/master.test.js', () => {
@@ -319,18 +320,27 @@ describe('test/master.test.js', () => {
 
   describe('after started', () => {
     let app;
+    let readyMsg;
 
     after(() => app.close());
 
     before(() => {
       app = utils.cluster('apps/egg-ready');
       // app.debug();
+      setTimeout(() => {
+        app.proc.on('message', msg => {
+          if (msg.to === 'parent' && msg.action === 'egg-ready') {
+            readyMsg = `parent: port=${msg.data.port}, address=${msg.data.address}`;
+          }
+        });
+      }, 1);
       return app.ready();
     });
 
     it('app/agent should recieve egg-ready', function* () {
       // work for message sent
       yield sleep(5000);
+      assert(readyMsg.match(/parent: port=\d+, address=http:\/\/127.0.0.1:\d+/));
       app.expect('stdout', /agent receive egg-ready, with 1 workers/);
       app.expect('stdout', /app receive egg-ready/);
     });
@@ -394,18 +404,149 @@ describe('test/master.test.js', () => {
     });
   });
 
-  describe('debug port', () => {
+  describe('debug', () => {
     let app;
     afterEach(() => app.close());
 
-    it('should set agent\'s debugPort', done => {
-      app = utils.cluster('apps/agent-debug-port');
+    // 6.x: Debugger listening on [::]:5858
+    // 8.x: Debugger listening on ws://127.0.0.1:9229/221caad4-e2d0-4630-b0bb-f7fb27b81ff6
+    const debugProtocol = semver.gte(process.version, '8.0.0') ? 'inspect' : 'debug';
 
-      app
+    it('should debug', () => {
+      app = utils.cluster('apps/debug-port', { workers: 2, opt: { execArgv: [ `--${debugProtocol}` ] } });
+
+      return app
         // .debug()
         .coverage(false)
+        // master
+        .expect('stderr', /Debugger listening on .*:(5858|9229)/)
+        // agent
+        .expect('stderr', /Debugger listening on .*:5856/)
         .expect('stdout', /debug port of agent is 5856/)
-        .end(done);
+        // worker#1
+        .expect('stderr', /Debugger listening on .*:(5859|9230)/)
+        .expect('stdout', /debug port of app is (5859|9230)/)
+        // worker#2
+        .expect('stderr', /Debugger listening on .*:(5860|9231)/)
+        .expect('stdout', /debug port of app is (5860|9231)/)
+        .end();
+    });
+
+    it('should debug with port', () => {
+      app = utils.cluster('apps/debug-port', { workers: 2, opt: { execArgv: [ `--${debugProtocol}=9000` ] } });
+
+      return app
+        // .debug()
+        .coverage(false)
+        // master
+        .expect('stderr', /Debugger listening on .*:9000/)
+        // agent
+        .expect('stderr', /Debugger listening on .*:5856/)
+        .expect('stdout', /debug port of agent is 5856/)
+        // worker#1
+        .expect('stderr', /Debugger listening on .*:9001/)
+        .expect('stdout', /debug port of app is 9001/)
+        // worker#2
+        .expect('stderr', /Debugger listening on .*:9002/)
+        .expect('stdout', /debug port of app is 9002/)
+        .end();
+    });
+
+    describe('debug message', () => {
+      const result = { app: [], agent: {} };
+
+      after(() => app.close());
+
+      before(() => {
+        app = utils.cluster('apps/egg-ready', { workers: 2, opt: { execArgv: [ `--${debugProtocol}` ] } });
+        // app.debug();
+        setTimeout(() => {
+          app.proc.on('message', msg => {
+            if (msg.to === 'parent' && msg.action === 'debug') {
+              if (msg.from === 'agent') {
+                result.agent = msg.data;
+              } else {
+                result.app.push(msg.data);
+              }
+            }
+          });
+        }, 1);
+        return app.ready();
+      });
+
+      it('parent should recieve debug', function* () {
+        // work for message sent
+        yield sleep(5000);
+        app.expect('stdout', /agent receive egg-ready, with 2 workers/);
+        app.expect('stdout', /app receive egg-ready/);
+        assert(result.agent.debugPort === 5856);
+        assert(result.app.length === 2);
+        assert(result.app[0].pid);
+        assert(result.app[0].debugPort === 5859 || result.app[0].debugPort === 9230);
+        assert(result.app[1].debugPort === 5860 || result.app[1].debugPort === 9231);
+      });
+    });
+
+    describe('debug message with port', () => {
+      const result = { app: [], agent: {} };
+
+      after(() => app.close());
+
+      before(() => {
+        app = utils.cluster('apps/egg-ready', { workers: 2, opt: { execArgv: [ `--${debugProtocol}=9000` ] } });
+        // app.debug();
+        setTimeout(() => {
+          app.proc.on('message', msg => {
+            if (msg.to === 'parent' && msg.action === 'debug') {
+              if (msg.from === 'agent') {
+                result.agent = msg.data;
+              } else {
+                result.app.push(msg.data);
+              }
+            }
+          });
+        }, 1);
+        return app.ready();
+      });
+
+      it('parent should recieve debug', function* () {
+        // work for message sent
+        yield sleep(5000);
+        app.expect('stdout', /agent receive egg-ready, with 2 workers/);
+        app.expect('stdout', /app receive egg-ready/);
+        assert(result.agent.debugPort === 5856);
+        assert(result.app.length === 2);
+        assert(result.app[0].debugPort && result.app[0].pid);
+        assert(result.app[0].debugPort === 9001);
+        assert(result.app[1].debugPort === 9002);
+      });
+    });
+
+    describe('should not debug message', () => {
+      let result;
+
+      after(() => app.close());
+
+      before(() => {
+        app = utils.cluster('apps/egg-ready');
+        // app.debug();
+        setTimeout(() => {
+          app.proc.on('message', msg => {
+            if (msg.to === 'parent' && msg.action === 'debug') {
+              result = true;
+            }
+          });
+        }, 1);
+        return app.ready();
+      });
+
+      it('parent should not recieve debug', function* () {
+        // work for message sent
+        yield sleep(5000);
+        app.expect('stdout', /agent receive egg-ready, with 1 workers/);
+        app.expect('stdout', /app receive egg-ready/);
+        assert(!result);
+      });
     });
   });
 
