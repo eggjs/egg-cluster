@@ -50,22 +50,17 @@ startCluster(options, () => {
 
 ## Options
 
-| Param         | Type              | Description                              |
-| ------------- | ----------------- | ---------------------------------------- |
-| baseDir       | `String`          | directory of application                 |
-| framework     | `String`          | specify framework that can be absolute path or npm package |
-| plugins       | `Object`          | plugins for unittest                     |
-| workers       | `Number`          | numbers of app workers                   |
-| sticky        | `Boolean`         | sticky mode server                       |
-| port          | `Number`          | port                                     |
-| https         | `Boolean`         | start a https server                     |
-| key           | `String`          | ssl key                                  |
-| cert          | `String`          | ssl cert                                 |
-| debug         | `Booolean/Number` | whether debug worker.Default to 9229(inspect) or 5858(debug). Automatically detect the protocol used by the targeted runtime, 8.0+ the new 'inspector' protocol is used. |
-| debugAgent    | `Booolean/Number` | whether debug agent. Default to 9227(inspect) or 5856(debug). |
-| debugBrk      | `Booolean`        | whether stop at the top of worker initial script. |
-| debugAgentBrk | `Booolean`        | whether stop at the top of agent initial script. |
-
+| Param     | Type      | Description              |
+| --------- | --------- | ------------------------ |
+| baseDir   | `String`  | directory of application |
+| framework | `String`  | specify framework that can be absolute path or npm package |
+| plugins   | `Object`  | plugins for unittest     |
+| workers   | `Number`  | numbers of app workers   |
+| sticky    | `Boolean` | sticky mode server       |
+| port      | `Number`  | port                     |
+| https     | `Boolean` | start a https server     |
+| key       | `String`  | ssl key                  |
+| cert      | `String`  | ssl cert                 |
 
 ## License
 

@@ -241,8 +241,7 @@ describe('test/master.test.js', () => {
       yield sleep(10000);
       app.expect('stdout', /app -> agent/);
       app.expect('stdout', /agent -> app/);
-      app.expect('stdout', /app: agent2appbystring/);
-      app.expect('stdout', /agent: app2agentbystring/);
+      app.expect('stdout', /agent2appbystring/);
     });
 
     it('should send multi app worker', function* () {
@@ -319,92 +318,20 @@ describe('test/master.test.js', () => {
 
   describe('after started', () => {
     let app;
-    let readyMsg;
 
     after(() => app.close());
 
     before(() => {
       app = utils.cluster('apps/egg-ready');
       // app.debug();
-      setTimeout(() => {
-        app.proc.on('message', msg => {
-          if (msg.to === 'parent' && msg.action === 'egg-ready') {
-            readyMsg = `parent: port=${msg.data.port}, address=${msg.data.address}`;
-          }
-        });
-      }, 1);
       return app.ready();
     });
 
     it('app/agent should recieve egg-ready', function* () {
       // work for message sent
       yield sleep(5000);
-      assert(readyMsg.match(/parent: port=\d+, address=http:\/\/127.0.0.1:\d+/));
       app.expect('stdout', /agent receive egg-ready, with 1 workers/);
       app.expect('stdout', /app receive egg-ready/);
-    });
-  });
-
-  describe('debug message', () => {
-    let app;
-    const result = { app: [], agent: {} };
-
-    after(() => app.close());
-
-    before(() => {
-      app = utils.cluster('apps/egg-ready', { debug: true, debugAgent: true, workers: 2 });
-      // app.debug();
-      setTimeout(() => {
-        app.proc.on('message', msg => {
-          if (msg.to === 'parent' && msg.action === 'debug') {
-            if (msg.from === 'agent') {
-              result.agent = msg.data;
-            } else {
-              result.app.push(msg.data);
-            }
-          }
-        });
-      }, 1);
-      return app.ready();
-    });
-
-    it('parent should recieve debug', function* () {
-      // work for message sent
-      yield sleep(5000);
-      app.expect('stdout', /agent receive egg-ready, with 2 workers/);
-      app.expect('stdout', /app receive egg-ready/);
-      assert(result.agent.debugPort === 9227 || result.agent.debugPort === 5856);
-      assert(result.app.length === 2);
-      assert(result.app[0].debugPort && result.app[0].pid);
-      assert(Math.abs(result.app[0].debugPort - result.app[1].debugPort) === 1);
-    });
-  });
-
-  describe('should not debug message', () => {
-    let app;
-    let result;
-
-    after(() => app.close());
-
-    before(() => {
-      app = utils.cluster('apps/egg-ready');
-      // app.debug();
-      setTimeout(() => {
-        app.proc.on('message', msg => {
-          if (msg.to === 'parent' && msg.action === 'debug') {
-            result = true;
-          }
-        });
-      }, 1);
-      return app.ready();
-    });
-
-    it('parent should not recieve debug', function* () {
-      // work for message sent
-      yield sleep(5000);
-      app.expect('stdout', /agent receive egg-ready, with 1 workers/);
-      app.expect('stdout', /app receive egg-ready/);
-      assert(!result);
     });
   });
 
@@ -436,9 +363,9 @@ describe('test/master.test.js', () => {
       }
 
       yield sleep(9000);
-      // oh, one worker dead
+      // 一个 worker 挂了
       app.expect('stdout', /#3 agent get 1 workers \[ \d+ \]/);
-      // never mind, fork new worker
+      // 又启动了一个 worker
       app.expect('stdout', /#4 agent get 2 workers \[ \d+, \d+ \]/);
     });
   });
@@ -470,103 +397,14 @@ describe('test/master.test.js', () => {
     let app;
     afterEach(() => app.close());
 
-    // 6.x: Debugger listening on [::]:5858
-    // 8.x: Debugger listening on ws://127.0.0.1:9229/221caad4-e2d0-4630-b0bb-f7fb27b81ff6
-
-    it('debug = true', () => {
-      app = utils.cluster('apps/debug-port', { debug: true });
-
-      return app
-        // .debug()
-        .expect('stderr', /Debugger listening on .*:(5858|9229)/)
-        .expect('stdout', /debug port of app is (5858|9229)/)
-        .end();
-    });
-
-    it('debug = 9999', () => {
-      app = utils.cluster('apps/debug-port', { debug: 9999 });
-
-      return app
-        // .debug()
-        .expect('stderr', /Debugger listening on .*:9999/)
-        .expect('stdout', /debug port of app is 9999/)
-        .end();
-    });
-
-    it('debugAgent = true', () => {
-      app = utils.cluster('apps/debug-port', { debugAgent: true });
-
-      return app
-        // .debug()
-        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
-        .expect('stdout', /debug port of agent is (5856|9227)/)
-        .end();
-    });
-
-    it('debugAgent = 9999', () => {
-      app = utils.cluster('apps/debug-port', { debugAgent: 9999 });
-
-      return app
-        // .debug()
-        .expect('stderr', /Debugger listening on .*:9999/)
-        .expect('stdout', /debug port of agent is 9999/)
-        .end();
-    });
-
-    it('debug = true, debugAgent = true', () => {
-      app = utils.cluster('apps/debug-port', { debug: true, debugAgent: true });
-
-      return app
-        // .debug()
-        .expect('stderr', /Debugger listening on .*:(5858|9229)/)
-        .expect('stdout', /debug port of app is (5858|9229)/)
-        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
-        .expect('stdout', /debug port of agent is (5856|9227)/)
-        .end();
-    });
-
-    it('debug = 9999, debugAgent = true', () => {
-      app = utils.cluster('apps/debug-port', { debug: 9999, debugAgent: true });
-
-      return app
-        // .debug()
-        .expect('stderr', /Debugger listening on .*:9999/)
-        .expect('stdout', /debug port of app is 9999/)
-        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
-        .expect('stdout', /debug port of agent is (5856|9227)/)
-        .end();
-    });
-
-    it('debugBrk = true', done => {
-      app = utils.cluster('apps/debug-port', { debugBrk: true });
+    it('should set agent\'s debugPort', done => {
+      app = utils.cluster('apps/agent-debug-port');
 
       app
         // .debug()
-        .expect('stderr', /Debugger listening on .*:(5858|9229)/)
-        .notExpect('stdout', /\[master] egg started on http:\/\/127.0.0.1/)
+        .coverage(false)
+        .expect('stdout', /debug port of agent is 5856/)
         .end(done);
-
-      setTimeout(() => {
-        console.log('exit');
-        app.close();
-      }, 5000);
-    });
-
-    it('debugAgentBrk = true', done => {
-      app = utils.cluster('apps/debug-port', { debugAgentBrk: true });
-
-      app
-        // .debug()
-        .expect('stderr', /Debugger listening on .*:(5856|9227)/)
-        .notExpect('stdout', /\[master] egg started on http:\/\/127.0.0.1/)
-        .notExpect('stdout', /\agent_worker#1:\d+ started/)
-        .notExpect('stdout', /start appWorker/)
-        .end(done);
-
-      setTimeout(() => {
-        console.log('exit');
-        app.close();
-      }, 5000);
     });
   });
 

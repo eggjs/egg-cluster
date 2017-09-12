@@ -1,21 +1,20 @@
 'use strict';
 
 module.exports = function(app) {
-  // from parent
+  // 接受来自 parent 的消息
   app.messenger.on('parent2app', msg => console.log(msg));
 
-  // send to parent
+  // 发送给 parent
   process.send({
     action: 'app2parent',
     data: 'app -> parent',
     to: 'parent',
   });
 
-  // send to app
+  // 发送给 app
   app.messenger.sendToAgent('app2agent', 'app -> agent');
   app.messenger.on('agent2app', msg => console.log(msg));
 
-  // compatible with string
-  process.send('app2agentbystring');
-  app.messenger.on('agent2appbystring', msg => console.log('app: ' + msg));
+  // 兼容 string
+  process.send('agent2appbystring');
 };
