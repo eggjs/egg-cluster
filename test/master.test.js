@@ -241,7 +241,8 @@ describe('test/master.test.js', () => {
       yield sleep(10000);
       app.expect('stdout', /app -> agent/);
       app.expect('stdout', /agent -> app/);
-      app.expect('stdout', /agent2appbystring/);
+      app.expect('stdout', /app: agent2appbystring/);
+      app.expect('stdout', /agent: app2agentbystring/);
     });
 
     it('should send multi app worker', function* () {
@@ -363,9 +364,9 @@ describe('test/master.test.js', () => {
       }
 
       yield sleep(9000);
-      // 一个 worker 挂了
+      // oh, one worker dead
       app.expect('stdout', /#3 agent get 1 workers \[ \d+ \]/);
-      // 又启动了一个 worker
+      // never mind, fork new worker
       app.expect('stdout', /#4 agent get 2 workers \[ \d+, \d+ \]/);
     });
   });
