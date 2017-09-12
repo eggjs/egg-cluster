@@ -60,6 +60,24 @@ describe('test/options.test.js', () => {
     assert(options.workers === 1);
   });
 
+  describe('debug', () => {
+    it('empty', () => {
+      mm(process, 'execArgv', []);
+      const options = parseOptions({});
+      assert(options.isDebug === undefined);
+    });
+    it('--inspect', () => {
+      mm(process, 'execArgv', [ '--inspect=9229' ]);
+      const options = parseOptions({});
+      assert(options.isDebug === true);
+    });
+    it('--debug', () => {
+      mm(process, 'execArgv', [ '--debug=5858' ]);
+      const options = parseOptions({});
+      assert(options.isDebug === true);
+    });
+  });
+
   describe('options', () => {
     let app;
     before(() => {
