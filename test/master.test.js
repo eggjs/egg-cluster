@@ -548,6 +548,37 @@ describe('test/master.test.js', () => {
         assert(!result);
       });
     });
+
+    describe('kill at debug', () => {
+      let workerPid;
+
+      after(() => app.close());
+
+      before(() => {
+        app = utils.cluster('apps/egg-ready', { workers: 1, opt: { execArgv: [ `--${debugProtocol}` ] } });
+        // app.debug();
+        setTimeout(() => {
+          app.proc.on('message', msg => {
+            if (msg.to === 'parent' && msg.action === 'debug' && msg.from === 'app') {
+              workerPid = msg.data.pid;
+            }
+            if (msg.action === 'egg-ready') {
+              process.kill(workerPid, 'SIGKILL');
+            }
+          });
+        }, 1);
+        return app.ready();
+      });
+
+      it('should not log err', function* () {
+        // work for message sent
+        yield sleep(5000);
+        app.expect('stderr', /\[master] app_worker#.*signal: SIGKILL/);
+        app.expect('stderr', /\[master] worker kill by debugger, exiting/);
+        app.expect('stdout', /\[master] exit with code:0/);
+        app.notExpect('stderr', /AppWorkerDiedError/);
+      });
+    });
   });
 
   describe('--sticky', () => {
