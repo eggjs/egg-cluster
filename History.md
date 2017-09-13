@@ -1,4 +1,16 @@
 
+1.11.2 / 2017-09-13
+==================
+
+**features**
+  * [[`61b5b66`](http://github.com/eggjs/egg-cluster/commit/61b5b660146b5ef3795f7f2fe4d61195ca6d93c1)] - feat: simplify debug error when kill by vscode (TZ <<atian25@qq.com>>)
+  * [[`308d9fd`](http://github.com/eggjs/egg-cluster/commit/308d9fde230122dd1d85d9563dd64c5103f8a7df)] - feat: debug & egg-ready message (TZ <<atian25@qq.com>>)
+  * [[`a4fa5f5`](http://github.com/eggjs/egg-cluster/commit/a4fa5f5171226354d02760edbfc20db8eca3f9e1)] - feat: delete default port options that has defined in egg (#40) (Haoliang Gao <<sakura9515@gmail.com>>)
+  * [[`09ccc5a`](http://github.com/eggjs/egg-cluster/commit/09ccc5ab62bbac2a214d80589dcc1695adfb6b90)] - feat: revert to 1.9.2 (TZ <<atian25@qq.com>>)
+
+**others**
+  * [[`ab76a19`](http://github.com/eggjs/egg-cluster/commit/ab76a19a8275906df757d2a9e585ccd89c62f6a5)] - test: improve cov (TZ <<atian25@qq.com>>)
+
 1.11.1 / 2017-09-11
 ==================
 
