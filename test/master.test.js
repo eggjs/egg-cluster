@@ -421,8 +421,8 @@ describe('test/master.test.js', () => {
         // master
         .expect('stderr', /Debugger listening on .*:(5858|9229)/)
         // agent
-        .expect('stderr', /Debugger listening on .*:5856/)
-        .expect('stdout', /debug port of agent is 5856/)
+        .expect('stderr', /Debugger listening on .*:5800/)
+        .expect('stdout', /debug port of agent is 5800/)
         // worker#1
         .expect('stderr', /Debugger listening on .*:(5859|9230)/)
         .expect('stdout', /debug port of app is (5859|9230)/)
@@ -441,8 +441,8 @@ describe('test/master.test.js', () => {
         // master
         .expect('stderr', /Debugger listening on .*:9000/)
         // agent
-        .expect('stderr', /Debugger listening on .*:5856/)
-        .expect('stdout', /debug port of agent is 5856/)
+        .expect('stderr', /Debugger listening on .*:5800/)
+        .expect('stdout', /debug port of agent is 5800/)
         // worker#1
         .expect('stderr', /Debugger listening on .*:9001/)
         .expect('stdout', /debug port of app is 9001/)
@@ -479,7 +479,7 @@ describe('test/master.test.js', () => {
         yield sleep(5000);
         app.expect('stdout', /agent receive egg-ready, with 2 workers/);
         app.expect('stdout', /app receive egg-ready/);
-        assert(result.agent.debugPort === 5856);
+        assert(result.agent.debugPort === 5800);
         assert(result.app.length === 2);
         assert(result.app[0].pid);
         assert(result.app[0].debugPort === 5859 || result.app[0].debugPort === 9230);
@@ -514,7 +514,7 @@ describe('test/master.test.js', () => {
         yield sleep(5000);
         app.expect('stdout', /agent receive egg-ready, with 2 workers/);
         app.expect('stdout', /app receive egg-ready/);
-        assert(result.agent.debugPort === 5856);
+        assert(result.agent.debugPort === 5800);
         assert(result.app.length === 2);
         assert(result.app[0].debugPort && result.app[0].pid);
         assert(result.app[0].debugPort === 9001);
