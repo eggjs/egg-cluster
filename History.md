@@ -1,4 +1,10 @@
 
+1.12.0 / 2017-09-14
+==================
+
+**features**
+  * [[`56bff0d`](http://github.com/eggjs/egg-cluster/commit/56bff0dda04074cbd7259b2652954832647a9a61)] - feat: agent debugPort 5856 -> 5800 (TZ <<atian25@qq.com>>)
+
 1.11.2 / 2017-09-13
 ==================
 
