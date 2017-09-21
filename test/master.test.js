@@ -322,9 +322,8 @@ describe('test/master.test.js', () => {
     let app;
     let readyMsg;
 
-    after(() => app.close());
-
     before(() => {
+      mm.env('default');
       app = utils.cluster('apps/egg-ready');
       // app.debug();
       setTimeout(() => {
@@ -336,13 +335,35 @@ describe('test/master.test.js', () => {
       }, 1);
       return app.ready();
     });
+    after(() => app.close());
 
     it('app/agent should recieve egg-ready', function* () {
       // work for message sent
       yield sleep(5000);
       assert(readyMsg.match(/parent: port=\d+, address=http:\/\/127.0.0.1:\d+/));
       app.expect('stdout', /agent receive egg-ready, with 1 workers/);
-      app.expect('stdout', /app receive egg-ready/);
+      app.expect('stdout', /app receive egg-ready, worker 1/);
+    });
+
+    it('should recieve egg-ready when app restart', function* () {
+      yield request(app.callback())
+        .get('/exception-app')
+        .expect(200);
+
+      yield sleep(5000);
+
+      app.expect('stdout', /app receive egg-ready, worker 2/);
+    });
+
+    it('should recieve egg-ready when agent restart', function* () {
+      yield request(app.callback())
+        .get('/exception-agent')
+        .expect(200);
+
+      yield sleep(5000);
+
+      const matched = app.stdout.match(/agent receive egg-ready/g);
+      assert(matched.length === 2);
     });
   });
 
