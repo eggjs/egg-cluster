@@ -1,4 +1,10 @@
 
+1.12.1 / 2017-09-22
+==================
+
+**fixes**
+  * [[`30d120d`](http://github.com/eggjs/egg-cluster/commit/30d120dd292d79a25113c951664d18480dde2a00)] - fix: should send egg-ready when app/agent restarted after launched (#45) (Haoliang Gao <<sakura9515@gmail.com>>)
+
 1.12.0 / 2017-09-14
 ==================
 
