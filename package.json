@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/eggjs/egg-cluster#readme",
   "dependencies": {
-    "cfork": "^1.6.1",
+    "cfork": "^1.7.0",
     "cluster-reload": "^1.0.2",
     "debug": "^3.0.1",
     "detect-port": "^1.2.1",
