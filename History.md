@@ -1,4 +1,10 @@
 
+1.12.2 / 2017-09-28
+===================
+
+**fixes**
+  * [[`0c886a4`](https://github.com/eggjs/egg-cluster/commit/0c886a43ecac25e79de910cb04778efc77aab9a4)] - fix: should disable worker refork (#46) (fengmk2 <<fengmk2@gmail.com>>)
+
 1.12.1 / 2017-09-22
 ==================
 
