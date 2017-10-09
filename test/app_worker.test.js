@@ -241,7 +241,7 @@ describe('test/app_worker.test.js', () => {
     });
   });
 
-  it.only('should exit when EADDRINUSE', function* () {
+  it('should exit when EADDRINUSE', function* () {
     mm.env('default');
 
     app = utils.cluster('apps/app-server', { cache: false, port: 17001 });
