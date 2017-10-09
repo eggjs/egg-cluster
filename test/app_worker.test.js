@@ -241,4 +241,24 @@ describe('test/app_worker.test.js', () => {
     });
   });
 
+  it.only('should exit when EADDRINUSE', function* () {
+    mm.env('default');
+
+    app = utils.cluster('apps/app-server', { cache: false, port: 17001 });
+    // app.debug();
+    yield app.ready();
+
+    let app2;
+    try {
+      app2 = utils.cluster('apps/app-server', { cache: false, port: 17001 });
+      app2.debug();
+      yield app2.ready();
+
+      app2.expect('code', 1);
+      app2.expect('stderr', /\[app_worker] server got error: bind EADDRINUSE null:17001, code: EADDRINUSE/);
+      app2.expect('stderr', /don't fork/);
+    } finally {
+      yield app2.close();
+    }
+  });
 });
