@@ -241,4 +241,13 @@ describe('test/app_worker.test.js', () => {
     });
   });
 
+  it.only('should run custom close when app exit', function* () {
+    app = utils.cluster('apps/app-exit');
+    app.debug();
+    yield app.ready();
+
+    yield app.close();
+
+    yield sleep(10000);
+  });
 });
