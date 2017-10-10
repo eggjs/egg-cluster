@@ -72,19 +72,14 @@ describe('test/app_worker.test.js', () => {
     after(mm.restore);
 
     it('should restart', function* () {
-      try {
-        yield app.httpRequest()
-          .get('/exit');
-      } catch (_) {
-        // ignore
-      }
+      yield app.httpRequest()
+        .get('/exit')
+        .expect(200);
 
       // wait app worker restart
       yield sleep(15000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
-      app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
-      app.expect('stderr', /app_worker#1:\d+ died/);
       app.expect('stdout', /app_worker#2:\d+ started/);
     });
   });
