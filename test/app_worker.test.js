@@ -244,13 +244,13 @@ describe('test/app_worker.test.js', () => {
   it('should exit when EADDRINUSE', function* () {
     mm.env('default');
 
-    app = utils.cluster('apps/app-server', { cache: false, port: 17001 });
+    app = utils.cluster('apps/app-server', { port: 17001 });
     // app.debug();
     yield app.ready();
 
     let app2;
     try {
-      app2 = utils.cluster('apps/app-server', { cache: false, port: 17001 });
+      app2 = utils.cluster('apps/app-server', { port: 17001 });
       app2.debug();
       yield app2.ready();
 
@@ -260,5 +260,46 @@ describe('test/app_worker.test.js', () => {
     } finally {
       yield app2.close();
     }
+  });
+
+  describe('refork', () => {
+    beforeEach(() => {
+      mm.env('default');
+    });
+
+    it('should refork when app_worker exit', function* () {
+      app = utils.cluster('apps/app-die');
+      // app.debug();
+      yield app.ready();
+
+      yield app.httpRequest()
+        .get('/exit')
+        .expect(200);
+
+      yield sleep(5000);
+
+      app.expect('stdout', /app_worker#1:\d+ started at 17001/);
+      app.expect('stderr', /new worker:\d+ fork/);
+      app.expect('stdout', /app_worker#1:\d+ disconnect/);
+      app.expect('stdout', /app_worker#2:\d+ started at 17001/);
+
+      yield app.httpRequest()
+        .get('/exit')
+        .expect(200);
+
+      yield sleep(5000);
+
+      app.expect('stdout', /app_worker#3:\d+ started at 17001/);
+    });
+
+    it('should not refork when starting', function* () {
+      app = utils.cluster('apps/app-start-error');
+      // app.debug();
+      yield app.ready();
+
+      app.expect('stderr', /don't fork/);
+      app.expect('stderr', /app_worker#1:\d+ start fail/);
+      app.expect('code', 1);
+    });
   });
 });
