@@ -77,7 +77,7 @@ describe('test/app_worker.test.js', () => {
         .expect(200);
 
       // wait app worker restart
-      yield sleep(15000);
+      yield sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stdout', /app_worker#2:\d+ started/);
@@ -271,7 +271,7 @@ describe('test/app_worker.test.js', () => {
         .get('/exit')
         .expect(200);
 
-      yield sleep(5000);
+      yield sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ started at 17001/);
       app.expect('stderr', /new worker:\d+ fork/);
@@ -282,7 +282,7 @@ describe('test/app_worker.test.js', () => {
         .get('/exit')
         .expect(200);
 
-      yield sleep(5000);
+      yield sleep(10000);
 
       app.expect('stdout', /app_worker#3:\d+ started at 17001/);
     });
