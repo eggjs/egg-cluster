@@ -2,6 +2,9 @@
 
 module.exports = function(app) {
   app.get('/exit', function* () {
-    process.exit(1);
+    setTimeout(() => {
+      throw new Error('exit');
+    }, 10);
+    this.body = 'exit';
   });
 };

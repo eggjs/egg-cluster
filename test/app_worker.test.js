@@ -72,19 +72,14 @@ describe('test/app_worker.test.js', () => {
     after(mm.restore);
 
     it('should restart', function* () {
-      try {
-        yield app.httpRequest()
-          .get('/exit');
-      } catch (_) {
-        // ignore
-      }
+      yield app.httpRequest()
+        .get('/exit')
+        .expect(200);
 
       // wait app worker restart
-      yield sleep(15000);
+      yield sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
-      app.expect('stderr', /nodejs.AppWorkerDiedError: \[master\]/);
-      app.expect('stderr', /app_worker#1:\d+ died/);
       app.expect('stdout', /app_worker#2:\d+ started/);
     });
   });
@@ -241,4 +236,65 @@ describe('test/app_worker.test.js', () => {
     });
   });
 
+  it('should exit when EADDRINUSE', function* () {
+    mm.env('default');
+
+    app = utils.cluster('apps/app-server', { port: 17001 });
+    // app.debug();
+    yield app.ready();
+
+    let app2;
+    try {
+      app2 = utils.cluster('apps/app-server', { port: 17001 });
+      app2.debug();
+      yield app2.ready();
+
+      app2.expect('code', 1);
+      app2.expect('stderr', /\[app_worker] server got error: bind EADDRINUSE null:17001, code: EADDRINUSE/);
+      app2.expect('stderr', /don't fork/);
+    } finally {
+      yield app2.close();
+    }
+  });
+
+  describe('refork', () => {
+    beforeEach(() => {
+      mm.env('default');
+    });
+
+    it('should refork when app_worker exit', function* () {
+      app = utils.cluster('apps/app-die');
+      // app.debug();
+      yield app.ready();
+
+      yield app.httpRequest()
+        .get('/exit')
+        .expect(200);
+
+      yield sleep(10000);
+
+      app.expect('stdout', /app_worker#1:\d+ started at \d+/);
+      app.expect('stderr', /new worker:\d+ fork/);
+      app.expect('stdout', /app_worker#1:\d+ disconnect/);
+      app.expect('stdout', /app_worker#2:\d+ started at \d+/);
+
+      yield app.httpRequest()
+        .get('/exit')
+        .expect(200);
+
+      yield sleep(10000);
+
+      app.expect('stdout', /app_worker#3:\d+ started at \d+/);
+    });
+
+    it('should not refork when starting', function* () {
+      app = utils.cluster('apps/app-start-error');
+      // app.debug();
+      yield app.ready();
+
+      app.expect('stderr', /don't fork/);
+      app.expect('stderr', /app_worker#1:\d+ start fail/);
+      app.expect('code', 1);
+    });
+  });
 });
