@@ -1,4 +1,10 @@
 
+1.12.3 / 2017-10-12
+==================
+
+**fixes**
+  * [[`4b80f33`](http://github.com/eggjs/egg-cluster/commit/4b80f33d272b374e005f3dd2f9dc39865f0d3688)] - fix: master should exit when EADDRINUSE error (#48) (Haoliang Gao <<sakura9515@gmail.com>>)
+
 1.12.2 / 2017-09-28
 ===================
 
