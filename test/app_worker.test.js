@@ -43,13 +43,13 @@ describe('test/app_worker.test.js', () => {
         .end();
     });
 
-    it('should remove error listener after ready', function* () {
+    it.only('should remove error listener after ready', function* () {
       app = utils.cluster('apps/app-error-listeners');
       yield app.ready();
       yield app.httpRequest()
         .get('/')
         .expect({
-          beforeReady: 2,
+          beforeReady: 1,
           afterReady: 1,
         });
       yield app.close();
