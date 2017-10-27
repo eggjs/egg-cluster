@@ -49,7 +49,7 @@ describe('test/app_worker.test.js', () => {
       yield app.httpRequest()
         .get('/')
         .expect({
-          beforeReady: 2,
+          beforeReady: 1,
           afterReady: 1,
         });
       yield app.close();
