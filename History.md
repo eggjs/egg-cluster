@@ -1,4 +1,10 @@
 
+1.12.4 / 2017-10-29
+==================
+
+**others**
+  * [[`b768018`](http://github.com/eggjs/egg-cluster/commit/b768018b77e1c6f80e8cfd9e9c38e63ec44a473d)] - refactor: use utility to read json (#49) (Haoliang Gao <<sakura9515@gmail.com>>)
+
 1.12.3 / 2017-10-12
 ==================
 
