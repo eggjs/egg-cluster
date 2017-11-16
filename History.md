@@ -1,4 +1,13 @@
 
+1.12.5 / 2017-11-16
+==================
+
+**fixes**
+  * [[`c683b67`](http://github.com/eggjs/egg-cluster/commit/c683b678c2474fca1e9dad8101525c9661177486)] - fix: crash when socket destroyed during connecting (#50) (Hengfei Zhuang <<zhuanghengfei@gmail.com>>)
+
+**others**
+  * [[`242835e`](http://github.com/eggjs/egg-cluster/commit/242835e4948b2b2f76352683aeee4bb2bd84186c)] - test: `don't fork` has been printed to stdout (#52) (Haoliang Gao <<sakura9515@gmail.com>>)
+
 1.12.4 / 2017-10-29
 ==================
 
