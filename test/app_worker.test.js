@@ -251,7 +251,7 @@ describe('test/app_worker.test.js', () => {
 
       app2.expect('code', 1);
       app2.expect('stderr', /\[app_worker] server got error: bind EADDRINUSE null:17001, code: EADDRINUSE/);
-      app2.expect('stderr', /don't fork/);
+      app2.expect('stdout', /don't fork/);
     } finally {
       yield app2.close();
     }
@@ -292,7 +292,7 @@ describe('test/app_worker.test.js', () => {
       // app.debug();
       yield app.ready();
 
-      app.expect('stderr', /don't fork/);
+      app.expect('stdout', /don't fork/);
       app.expect('stderr', /app_worker#1:\d+ start fail/);
       app.expect('code', 1);
     });
