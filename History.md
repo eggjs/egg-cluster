@@ -1,4 +1,10 @@
 
+1.12.6 / 2017-11-21
+==================
+
+**fixes**
+  * [[`ccdbf9f`](http://github.com/eggjs/egg-cluster/commit/ccdbf9f34a9eb38333a7a12ab0ec22e3b1bea344)] - fix: should send current worker pids when agent restart (#53) (Haoliang Gao <<sakura9515@gmail.com>>)
+
 1.12.5 / 2017-11-16
 ==================
 
