@@ -372,7 +372,6 @@ describe('test/master.test.js', () => {
     before(() => {
       mm.env('default');
       app = utils.cluster('apps/pid', { workers: 2 });
-      app.coverage(false);
       // app.debug();
       return app.ready();
     });
@@ -399,6 +398,16 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /#3 agent get 1 workers \[ \d+ \]/);
       // never mind, fork new worker
       app.expect('stdout', /#4 agent get 2 workers \[ \d+, \d+ \]/);
+    });
+
+    it('agent should get message when agent restart', function* () {
+      app.process.send({
+        to: 'agent',
+        action: 'kill-agent',
+      });
+
+      yield sleep(5000);
+      app.expect('stdout', /#1 agent get 2 workers \[ \d+, \d+ \]/);
     });
   });
 
