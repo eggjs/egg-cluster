@@ -627,4 +627,28 @@ describe('test/master.test.js', () => {
         .expect(200);
     });
   });
+
+  describe('agent and worker exception', () => {
+    it('should exit when no agent after check 3 times', done => {
+      app = utils.cluster('apps/agent-exit');
+      setTimeout(() => {
+        app.proc.once('exit', () => {
+          assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 0 agent and 1 worker(s) alive, exit to avoid unknown state'));
+          assert(app.stderr.includes('[master] exit with code:1'));
+          done();
+        });
+      }, 1000);
+    });
+
+    it('should exit when no app after check 3 times', done => {
+      app = utils.cluster('apps/app-exit');
+      setTimeout(() => {
+        app.proc.once('exit', () => {
+          assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 1 agent and 0 worker(s) alive, exit to avoid unknown state'));
+          assert(app.stderr.includes('[master] exit with code:1'));
+          done();
+        });
+      }, 1000);
+    });
+  });
 });
