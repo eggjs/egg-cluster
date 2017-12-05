@@ -1,4 +1,10 @@
 
+1.13.0 / 2017-12-05
+==================
+
+**features**
+  * [[`366d9bb`](http://github.com/eggjs/egg-cluster/commit/366d9bbb40db2b920258210f51b0a15fe224974c)] - feat: add worker manager and check worker/agent status (#54) (Yiyu He <<dead_horse@qq.com>>)
+
 1.12.6 / 2017-11-21
 ==================
 
