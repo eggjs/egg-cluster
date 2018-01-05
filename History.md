@@ -1,4 +1,10 @@
 
+1.13.1 / 2018-01-05
+==================
+
+**others**
+  * [[`53ed359`](http://github.com/eggjs/egg-cluster/commit/53ed359e32b395105d859de7ea4bc564fe3e9af1)] - chore: log runtime versions (#56) (TZ | 天猪 <<atian25@qq.com>>)
+
 1.13.0 / 2017-12-05
 ==================
 
