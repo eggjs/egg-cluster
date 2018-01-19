@@ -22,6 +22,23 @@ describe('test/options.test.js', () => {
       cert: utils.getFilepath('server.crt'),
     });
     assert(options.port === 8443);
+    assert(options.httpsOptions.key);
+    assert(options.httpsOptions.cert);
+  });
+
+  it('should start with httpsOptions and listen 8443', () => {
+    const options = parseOptions({
+      https: true,
+      httpsOptions: {
+        passphrase: '123456',
+        key: utils.getFilepath('server.key'),
+        cert: utils.getFilepath('server.crt'),
+      },
+    });
+    assert(options.port === 8443);
+    assert(options.httpsOptions.key);
+    assert(options.httpsOptions.cert);
+    assert(options.httpsOptions.passphrase);
   });
 
   it('should listen custom port 6001', () => {
