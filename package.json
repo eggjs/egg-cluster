@@ -35,11 +35,13 @@
     "cfork": "^1.7.0",
     "cluster-reload": "^1.0.2",
     "debug": "^3.1.0",
+    "depd": "^1.1.2",
     "detect-port": "^1.2.1",
     "egg-logger": "^1.6.0",
     "egg-utils": "^2.3.0",
     "get-ready": "^2.0.1",
     "graceful-process": "^1.0.0",
+    "is-type-of": "^1.2.0",
     "sendmessage": "^1.1.0",
     "utility": "^1.13.1"
   },

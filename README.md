@@ -58,8 +58,7 @@ startCluster(options, () => {
 | workers      | `Number`  | numbers of app workers                   |
 | sticky       | `Boolean` | sticky mode server                       |
 | port         | `Number`  | port                                     |
-| https        | `Boolean` | start a https server                     |
-| httpsOptions | `Object`  | https options, note: `key` / `cert` should be full path to file |
+| https        | `Object`  | start a https server, note: `key` / `cert` should be full path to file |
 
 ## License
 
