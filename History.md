@@ -1,4 +1,10 @@
 
+1.14.0 / 2018-02-05
+==================
+
+**features**
+  * [[`102a0ad`](http://github.com/eggjs/egg-cluster/commit/102a0adc8577ada8ff8383ba935f7973f215999f)] - feat: https options (#57) (TZ | 天猪 <<atian25@qq.com>>)
+
 1.13.1 / 2018-01-05
 ==================
 
