@@ -10,11 +10,11 @@ matrix:
   exclude:
   - node_js: '6'
     env: EGG_VERSION=2
-install: echo nothing
-script:
+install:
   - npm i npminstall
+script:
   - echo "npminstall egg@$EGG_VERSION"
-  - eval "npminstall egg@$EGG_VERSION"
+  - eval "npminstall -d egg@$EGG_VERSION"
   - npminstall
   - npm run ci
 after_script:
