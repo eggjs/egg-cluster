@@ -12,10 +12,10 @@ matrix:
     env: EGG_VERSION=2
 install:
   - npm i npminstall
-script:
-  - echo "npminstall egg@$EGG_VERSION"
-  - eval "npminstall -d egg@$EGG_VERSION"
+  - sed '/"egg":/d' package.json > package.json
   - npminstall
+script:
+  - eval "npminstall -d egg@$EGG_VERSION"
   - npm run ci
 after_script:
   - npminstall codecov && codecov
