@@ -12,8 +12,8 @@ matrix:
     env: EGG_VERSION=2
 install:
   - npm i npminstall
-  - sed '/"egg":/d' package.json > package.json
-  - npminstall
+  - sed -i.bak '/"egg":/d' package.json
+  - npminstall -d
 script:
   - eval "npminstall -d egg@$EGG_VERSION"
   - npm run ci
