@@ -636,7 +636,7 @@ describe('test/master.test.js', () => {
       // app worker won't be reforked in local
       mm.env('local');
       app = utils.cluster('apps/check-status');
-      // app.debug();
+      app.debug();
       yield app.ready();
       yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
 
