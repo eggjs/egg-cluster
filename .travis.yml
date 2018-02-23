@@ -4,18 +4,14 @@ node_js:
   - '6'
   - '8'
 env:
-  global:
-    - EGG_VERSION=1
-    - EGG_VERSION=2
-matrix:
-  exclude:
-  - node_js: '6'
-    env: EGG_VERSION=2
-install:
+  - EGG_VERSION=1
+  - EGG_VERSION=2
+install: echo nothing
+script:
   - npm i npminstall
+  - echo $EGG_VERSION
   - npminstall egg@$EGG_VERSION
   - npminstall
-script:
   - npm run ci
 after_script:
   - npminstall codecov && codecov
