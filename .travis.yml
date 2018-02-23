@@ -3,10 +3,9 @@ language: node_js
 node_js:
   - '6'
   - '8'
-matrix:
-  include:
-    env: EGG_VERSION=1
-    env: EGG_VERSION=2
+env:
+  - EGG_VERSION=1
+  - EGG_VERSION=2
 install:
   - npm i npminstall
   - npminstall egg@$EGG_VERSION
