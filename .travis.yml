@@ -14,7 +14,7 @@ install: echo nothing
 script:
   - npm i npminstall
   - echo $EGG_VERSION
-  - export EGG_VERSION=$EGG_VERSION && npminstall egg@${EGG_VERSION}
+  - echo "npminstall egg@$EGG_VERSION" | bash
   - npminstall
   - npm run ci
 after_script:
