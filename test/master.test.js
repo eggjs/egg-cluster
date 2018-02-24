@@ -1,11 +1,14 @@
 'use strict';
 
+const path = require('path');
 const mm = require('egg-mock');
 const assert = require('assert');
 const pedding = require('pedding');
 const sleep = require('mz-modules/sleep');
 const request = require('supertest');
 const semver = require('semver');
+const awaitEvent = require('await-event');
+const fs = require('mz/fs');
 const utils = require('./utils');
 
 describe('test/master.test.js', () => {
@@ -628,28 +631,37 @@ describe('test/master.test.js', () => {
     });
   });
 
-  // FIXME: make test pass
-  describe.skip('agent and worker exception', () => {
-    it('should exit when no agent after check 3 times', done => {
-      app = utils.cluster('apps/agent-exit');
-      setTimeout(() => {
-        app.proc.once('exit', () => {
-          assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 0 agent and 1 worker(s) alive, exit to avoid unknown state'));
-          assert(app.stderr.includes('[master] exit with code:1'));
-          done();
-        });
-      }, 1000);
+  describe('agent and worker exception', () => {
+    it('should exit when no agent after check 3 times', function* () {
+      // app worker won't be reforked in local
+      mm.env('local');
+      app = utils.cluster('apps/check-status');
+      app.debug();
+      yield app.ready();
+      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
+
+      // kill agent worker and will exit when start
+      app.process.send({ to: 'agent', action: 'kill' });
+
+      yield awaitEvent(app.proc, 'exit');
+
+      assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 0 agent and 1 worker(s) alive, exit to avoid unknown state'));
+      assert(app.stderr.includes('[master] exit with code:1'));
     });
 
-    it('should exit when no app after check 3 times', done => {
-      app = utils.cluster('apps/app-exit');
-      setTimeout(() => {
-        app.proc.once('exit', () => {
-          assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 1 agent and 0 worker(s) alive, exit to avoid unknown state'));
-          assert(app.stderr.includes('[master] exit with code:1'));
-          done();
-        });
-      }, 1000);
+    it('should exit when no app after check 3 times', function* () {
+      // app worker won't be reforked in local
+      mm.env('local');
+      app = utils.cluster('apps/check-status');
+      yield app.ready();
+
+      // kill app worker and wait checking
+      app.process.send({ to: 'app', action: 'kill' });
+
+      yield awaitEvent(app.proc, 'exit');
+
+      assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 1 agent and 0 worker(s) alive, exit to avoid unknown state'));
+      assert(app.stderr.includes('[master] exit with code:1'));
     });
   });
 });
