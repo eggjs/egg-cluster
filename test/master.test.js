@@ -664,4 +664,21 @@ describe('test/master.test.js', () => {
       assert(app.stderr.includes('[master] exit with code:1'));
     });
   });
+
+  describe('beforeClose', () => {
+    it('should wait app close', function* () {
+      mm.env('local');
+      app = utils.cluster('apps/before-close');
+      // app.debug();
+      yield app.ready();
+
+      yield app.close();
+      yield sleep(5000);
+
+      app.expect('stdout', /app closing/);
+      app.expect('stdout', /app closed/);
+      app.expect('stdout', /agent closing/);
+      app.expect('stdout', /agent closed/);
+    });
+  });
 });
