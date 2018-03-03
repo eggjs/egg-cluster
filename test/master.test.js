@@ -409,7 +409,7 @@ describe('test/master.test.js', () => {
         action: 'kill-agent',
       });
 
-      yield sleep(5000);
+      yield sleep(9000);
       app.expect('stdout', /#1 agent get 2 workers \[ \d+, \d+ \]/);
     });
   });
