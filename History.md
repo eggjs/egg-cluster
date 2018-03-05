@@ -1,4 +1,13 @@
 
+1.15.0 / 2018-03-05
+==================
+
+**features**
+  * [[`7f0be22`](http://github.com/eggjs/egg-cluster/commit/7f0be221808a29fd049fac4c0c53da8d48ce6e6e)] - feat: support beforeClose on other env (#59) (Haoliang Gao <<sakura9515@gmail.com>>)
+
+**others**
+  * [[`e0deece`](http://github.com/eggjs/egg-cluster/commit/e0deece60a04bdeeb9841fbb751d49d94a5b0828)] - test: fix unstable test (#58) (Haoliang Gao <<sakura9515@gmail.com>>)
+
 1.14.0 / 2018-02-05
 ==================
 
