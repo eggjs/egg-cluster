@@ -70,7 +70,7 @@ describe('test/master.test.js', () => {
       // 2017-05-27 21:24:38,106 INFO 59066 [agent_worker] receive signal SIGTERM, exiting with code:0
       // 2017-05-27 21:24:38,107 INFO 59066 [agent_worker] exit with code:0
       app.proc.kill('SIGTERM');
-      yield sleep(1000);
+      yield sleep(6000);
       assert(app.proc.killed === true);
       app.expect('stdout', /INFO \d+ \[master\] receive signal SIGTERM, closing/);
       app.expect('stdout', /DEBUG \d+ \[master\] close done, exiting with code:0/);
@@ -81,6 +81,7 @@ describe('test/master.test.js', () => {
       // app.notExpect('stderr', /\[agent_worker\] receive disconnect event /);
       app.expect('stdout', /INFO \d+ \[app_worker\] exit with code:0/);
       app.expect('stdout', /INFO \d+ \[agent_worker\] exit with code:0/);
+      app.expect('stdout', /INFO \d+ \[master\] wait 5s/);
     });
 
     it('master kill by SIGKILL and agent, app worker exit too', function* () {
