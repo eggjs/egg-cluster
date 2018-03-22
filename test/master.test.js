@@ -100,7 +100,7 @@ describe('test/master.test.js', () => {
       // 2017-05-28 00:08:19,109 ERROR 59501 [agent_worker] exit with code:110
       app.proc.kill('SIGKILL');
 
-      yield sleep(1000);
+      yield sleep(6000);
       assert(app.proc.killed === true);
       app.notExpect('stdout', /\[master\] receive signal SIGTERM, closing/);
       app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
@@ -126,7 +126,7 @@ describe('test/master.test.js', () => {
       // 2017-05-28 00:08:19,109 ERROR 59501 [agent_worker] exit with code:110
       app.proc.kill('SIGKILL');
 
-      yield sleep(1000);
+      yield sleep(6000);
       assert(app.proc.killed === true);
       app.notExpect('stdout', /\[master\] receive signal SIGTERM, closing/);
       app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
@@ -155,7 +155,7 @@ describe('test/master.test.js', () => {
       // 2017-05-28 00:14:33,047 INFO 59715 [agent_worker] receive signal SIGTERM, exiting with code:0
       // 2017-05-28 00:14:33,048 INFO 59715 [agent_worker] exit with code:0
       app.proc.kill('SIGTERM');
-      yield sleep(1000);
+      yield sleep(6000);
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
       app.expect('stdout', /\[master\] exit with code:0/);
@@ -172,7 +172,7 @@ describe('test/master.test.js', () => {
         .end();
 
       app.proc.kill('SIGQUIT');
-      yield sleep(1000);
+      yield sleep(6000);
 
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGQUIT, closing/);
@@ -191,7 +191,7 @@ describe('test/master.test.js', () => {
         .end();
 
       app.proc.kill('SIGINT');
-      yield sleep(1000);
+      yield sleep(6000);
 
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGINT, closing/);
