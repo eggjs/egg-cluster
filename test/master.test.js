@@ -81,7 +81,7 @@ describe('test/master.test.js', () => {
       // app.notExpect('stderr', /\[agent_worker\] receive disconnect event /);
       app.expect('stdout', /INFO \d+ \[app_worker\] exit with code:0/);
       app.expect('stdout', /INFO \d+ \[agent_worker\] exit with code:0/);
-      app.expect('stdout', /INFO \d+ \[master\] wait 5s/);
+      app.expect('stdout', /INFO \d+ \[master\] wait 5000ms/);
     });
 
     it('master kill by SIGKILL and agent, app worker exit too', function* () {
@@ -196,6 +196,27 @@ describe('test/master.test.js', () => {
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGINT, closing/);
       app.expect('stdout', /\[master\] exit with code:0/);
+    });
+
+    it('should close when set EGG_MASTER_CLOSE_TIMEOUT', function* () {
+      mm.env('local');
+      mm(process.env, 'EGG_APP_WORKER_LOGGER_LEVEL', 'INFO');
+      mm(process.env, 'EGG_AGENT_WORKER_LOGGER_LEVEL', 'INFO');
+      mm(process.env, 'EGG_MASTER_LOGGER_LEVEL', 'DEBUG');
+      mm(process.env, 'EGG_MASTER_CLOSE_TIMEOUT', 1000);
+      app = utils.cluster('apps/master-worker-started');
+      // app.debug();
+
+      yield app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
+
+      app.proc.kill('SIGTERM');
+      yield sleep(2000);
+      assert(app.proc.killed === true);
+      app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
+      app.expect('stdout', /INFO \d+ \[master\] wait 1000ms/);
     });
   });
 
@@ -606,7 +627,7 @@ describe('test/master.test.js', () => {
 
       it('should not log err', function* () {
         // work for message sent
-        yield sleep(5000);
+        yield sleep(6000);
         app.expect('stderr', /\[master] app_worker#.*signal: SIGKILL/);
         app.expect('stderr', /\[master] worker kill by debugger, exiting/);
         app.expect('stdout', /\[master] exit with code:0/);
