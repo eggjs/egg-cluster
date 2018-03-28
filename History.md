@@ -1,4 +1,10 @@
 
+1.16.0 / 2018-03-28
+===================
+
+  * fix: wait 5s when master exit (#60)
+  * feat: add typescript support (#61)
+
 1.15.0 / 2018-03-05
 ==================
 
