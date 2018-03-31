@@ -10,6 +10,7 @@ exports.cluster = function(name, options) {
     eggPath: path.dirname(require.resolve('egg')),
     cache: false,
   }, options);
+  console.log('###', require.extensions, options);
   return mm.cluster(options);
 };
 
