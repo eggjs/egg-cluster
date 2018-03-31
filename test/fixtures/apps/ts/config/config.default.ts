@@ -1,4 +1,5 @@
 'use strict';
+console.log('###', process.argv, process.execArgv);
 
 import { EggAppConfig } from 'egg';
 
