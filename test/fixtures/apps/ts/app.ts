@@ -1,7 +1,5 @@
 'use strict';
 
-import { Application } from 'egg';
-
-export default (app: Application) => {
+module.exports = app => {
   console.log(`hi, egg, ${app.config.keys}`);
-};
+}
