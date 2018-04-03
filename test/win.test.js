@@ -7,10 +7,10 @@ const parseKeyStr = require('../lib/utils/win').parseKeyStr;
 const tmpDir = os.tmpdir();
 const regex = /\\+/g;
 
-describe.only('test/win.test.js', () => {
+describe('test/win.test.js', () => {
   afterEach(mm.restore);
 
-  describe.only('should parseKeyStr() works', () => {
+  describe('should parseKeyStr() works', () => {
     it('should with title', () => {
       let title = 'foo';
       let ret = parseKeyStr({ title });
