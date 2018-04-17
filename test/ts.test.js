@@ -27,15 +27,4 @@ describe('test/ts.test.js', () => {
       .expect('code', 0)
       .end(done);
   });
-
-  it('require ts-node register', done => {
-    mm.env('local');
-    app = utils.cluster('apps/ts', {
-      typescript: true,
-    });
-    // app.debug();
-    app.expect('stderr', /`require.extensions` should contains `.ts`/)
-      .expect('code', 1)
-      .end(done);
-  });
 });
