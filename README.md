@@ -60,6 +60,8 @@ startCluster(options, () => {
 | port         | `Number`  | port                                     |
 | https        | `Object`  | start a https server, note: `key` / `cert` should be full path to file |
 | http2        | `Boolean` | start a http2 server                     |
+| typescript   | `Boolean` | enable loader's typescript support       |
+
 
 ## License
 
