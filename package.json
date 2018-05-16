@@ -43,6 +43,7 @@
     "graceful-process": "^1.2.0",
     "is-type-of": "^1.2.0",
     "sendmessage": "^1.1.0",
+    "semver": "^5.5.0",
     "utility": "^1.13.1"
   },
   "devDependencies": {
@@ -59,7 +60,6 @@
     "mz": "^2.7.0",
     "mz-modules": "^2.1.0",
     "pedding": "^1.1.0",
-    "semver": "^5.5.0",
     "supertest": "^3.0.0",
     "ts-node": "^5.0.1",
     "typescript": "^2.7.2"
