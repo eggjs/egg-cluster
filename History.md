@@ -1,4 +1,11 @@
 
+1.16.1 / 2018-05-16
+===================
+
+  * fix: use --inspect-port after 8.x (#69)
+  * fix: remove useless unittest (#65)
+  * fix: master close log print timeout error (#64)
+
 1.16.0 / 2018-03-28
 ===================
 
