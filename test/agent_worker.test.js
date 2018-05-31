@@ -13,6 +13,20 @@ describe('test/agent_worker.test.js', () => {
   describe('Fork Agent', () => {
     afterEach(() => app.close());
 
+    it('support config agent debug port', () => {
+      app = utils.cluster('apps/agent-debug-port', { isDebug: true, agentDebugPort: 15800 });
+      return app
+        .expect('stuout', /15800/)
+        .end();
+    });
+
+    it('agent debug port default 5800', () => {
+      app = utils.cluster('apps/agent-debug-port', { isDebug: true });
+      return app
+        .expect('stuout', /5800/)
+        .end();
+    });
+
     it('should exist when error happened during boot', () => {
       app = utils.cluster('apps/agent-die-onboot');
       return app
