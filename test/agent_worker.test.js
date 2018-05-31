@@ -3,6 +3,7 @@
 const assert = require('assert');
 const path = require('path');
 const coffee = require('coffee');
+const mm = require('egg-mock');
 const fs = require('mz/fs');
 const sleep = require('mz-modules/sleep');
 const utils = require('./utils');
@@ -14,7 +15,8 @@ describe('test/agent_worker.test.js', () => {
     afterEach(() => app.close());
 
     it('support config agent debug port', () => {
-      app = utils.cluster('apps/agent-debug-port', { isDebug: true, agentDebugPort: 15800 });
+      mm(process.env, 'EGG_AGENT_DEBUG_PORT', '15800');
+      app = utils.cluster('apps/agent-debug-port', { isDebug: true });
       return app
         .expect('stuout', /15800/)
         .end();
