@@ -654,9 +654,21 @@ describe('test/master.test.js', () => {
   });
 
   describe('agent and worker exception', () => {
-    it('should exit when no agent after check 3 times', function* () {
-      // app worker won't be reforked in local
+    it('should not exit when local env', function* () {
       mm.env('local');
+      app = utils.cluster('apps/check-status');
+      app.debug();
+      yield app.ready();
+      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
+
+      yield sleep(30000);
+
+      // process should exist
+      assert(app.process.exitCode === null);
+      app.process.kill('SIGINT');
+    });
+
+    it('should exit when no agent after check 3 times', function* () {
       app = utils.cluster('apps/check-status');
       app.debug();
       yield app.ready();
@@ -672,8 +684,6 @@ describe('test/master.test.js', () => {
     });
 
     it('should exit when no app after check 3 times', function* () {
-      // app worker won't be reforked in local
-      mm.env('local');
       app = utils.cluster('apps/check-status');
       yield app.ready();
 
