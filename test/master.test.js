@@ -657,7 +657,7 @@ describe('test/master.test.js', () => {
     it('should not exit when local env', function* () {
       mm.env('local');
       app = utils.cluster('apps/check-status');
-      app.debug();
+      // app.debug();
       yield app.ready();
       yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
 
@@ -670,7 +670,7 @@ describe('test/master.test.js', () => {
 
     it('should exit when no agent after check 3 times', function* () {
       app = utils.cluster('apps/check-status');
-      app.debug();
+      // app.debug();
       yield app.ready();
       yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
 
