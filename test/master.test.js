@@ -686,7 +686,7 @@ describe('test/master.test.js', () => {
       assert(app.stderr.includes('[master] exit with code:1'));
     });
 
-    it.only('should exit when no app after check 3 times', function* () {
+    it('should exit when no app after check 3 times', function* () {
       mm.env('prod');
       app = utils.cluster('apps/check-status');
       // app.debug();
