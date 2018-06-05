@@ -669,6 +669,7 @@ describe('test/master.test.js', () => {
     });
 
     it('should exit when no agent after check 3 times', function* () {
+      mm.env('prod');
       app = utils.cluster('apps/check-status');
       // app.debug();
       yield app.ready();
@@ -684,6 +685,7 @@ describe('test/master.test.js', () => {
     });
 
     it('should exit when no app after check 3 times', function* () {
+      mm.env('prod');
       app = utils.cluster('apps/check-status');
       yield app.ready();
 
