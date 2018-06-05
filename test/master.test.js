@@ -5,6 +5,7 @@ const mm = require('egg-mock');
 const assert = require('assert');
 const pedding = require('pedding');
 const sleep = require('mz-modules/sleep');
+const mkdirp = require('mz-modules/mkdirp');
 const request = require('supertest');
 const semver = require('semver');
 const awaitEvent = require('await-event');
@@ -673,6 +674,7 @@ describe('test/master.test.js', () => {
       app = utils.cluster('apps/check-status');
       // app.debug();
       yield app.ready();
+      mkdirp.sync(path.join(app.baseDir, 'logs'));
       yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
 
       // kill agent worker and will exit when start
@@ -684,10 +686,13 @@ describe('test/master.test.js', () => {
       assert(app.stderr.includes('[master] exit with code:1'));
     });
 
-    it('should exit when no app after check 3 times', function* () {
+    it.only('should exit when no app after check 3 times', function* () {
       mm.env('prod');
       app = utils.cluster('apps/check-status');
+      // app.debug();
       yield app.ready();
+      mkdirp.sync(path.join(app.baseDir, 'logs'));
+      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
 
       // kill app worker and wait checking
       app.process.send({ to: 'app', action: 'kill' });
