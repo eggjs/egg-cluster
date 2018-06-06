@@ -1,4 +1,10 @@
 
+1.17.0 / 2018-06-06
+==================
+
+**features**
+  * [[`134bd4c`](http://github.com/eggjs/egg-cluster/commit/134bd4c15361018747f6bc6c13748a8e60fc8b62)] - feat: not start check in local (#71) (Axes <<whxaxes@qq.com>>)
+
 1.16.1 / 2018-05-16
 ===================
 
