@@ -5,6 +5,7 @@ const mm = require('egg-mock');
 const assert = require('assert');
 const pedding = require('pedding');
 const sleep = require('mz-modules/sleep');
+const mkdirp = require('mz-modules/mkdirp');
 const request = require('supertest');
 const semver = require('semver');
 const awaitEvent = require('await-event');
@@ -654,12 +655,26 @@ describe('test/master.test.js', () => {
   });
 
   describe('agent and worker exception', () => {
-    it('should exit when no agent after check 3 times', function* () {
-      // app worker won't be reforked in local
+    it('should not exit when local env', function* () {
       mm.env('local');
       app = utils.cluster('apps/check-status');
-      app.debug();
+      // app.debug();
       yield app.ready();
+      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
+
+      yield sleep(30000);
+
+      // process should exist
+      assert(app.process.exitCode === null);
+      app.process.kill('SIGINT');
+    });
+
+    it('should exit when no agent after check 3 times', function* () {
+      mm.env('prod');
+      app = utils.cluster('apps/check-status');
+      // app.debug();
+      yield app.ready();
+      mkdirp.sync(path.join(app.baseDir, 'logs'));
       yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
 
       // kill agent worker and will exit when start
@@ -672,10 +687,12 @@ describe('test/master.test.js', () => {
     });
 
     it('should exit when no app after check 3 times', function* () {
-      // app worker won't be reforked in local
-      mm.env('local');
+      mm.env('prod');
       app = utils.cluster('apps/check-status');
+      // app.debug();
       yield app.ready();
+      mkdirp.sync(path.join(app.baseDir, 'logs'));
+      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
 
       // kill app worker and wait checking
       app.process.send({ to: 'app', action: 'kill' });
