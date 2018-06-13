@@ -3,19 +3,9 @@ language: node_js
 node_js:
   - '6'
   - '8'
-env:
-  - EGG_VERSION=1
-  - EGG_VERSION=2
-matrix:
-  exclude:
-  - node_js: '6'
-    env: EGG_VERSION=2
 install:
-  - npm i npminstall
-  - sed -i.bak '/"egg":/d' package.json
-  - npminstall -d
+  - npm i npminstall && npminstall
 script:
-  - eval "npminstall -d egg@$EGG_VERSION"
   - npm run ci
 after_script:
   - npminstall codecov && codecov
