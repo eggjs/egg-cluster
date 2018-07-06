@@ -26,6 +26,13 @@ describe('test/options.test.js', () => {
     assert(options.https.cert);
   });
 
+  it('should start with http2', () => {
+    const options = parseOptions({
+      http2: true,
+    });
+    assert(options.http2 === true);
+  });
+
   it('should start with httpsOptions and listen 8443', () => {
     const options = parseOptions({
       https: {
