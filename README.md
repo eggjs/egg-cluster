@@ -27,7 +27,7 @@ Cluster Manager for Egg
 ## Install
 
 ```bash
-$ npm i egg-cluster
+$ npm i egg-cluster --save
 ```
 
 ## Usage
@@ -60,7 +60,7 @@ startCluster(options, () => {
 | port         | `Number`  | port                                     |
 | https        | `Object`  | start a https server, note: `key` / `cert` should be full path to file |
 | typescript   | `Boolean` | enable loader's typescript support       |
-| require      | `Array`   | will inject into worker/agent process      |
+| require      | `Array|String` | will inject into worker/agent process |
 
 ## License
 
