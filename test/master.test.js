@@ -720,4 +720,42 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /agent closed/);
     });
   });
+
+  describe('--require', () => {
+    describe('one', () => {
+      before(() => {
+        app = utils.cluster('apps/options-require', {
+          require: path.join(__dirname, './fixtures/apps/options-require/inject.js'),
+        });
+        // app.debug();
+        return app.ready();
+      });
+      after(() => app.close());
+
+      it('should inject', () => {
+        app.expect('stdout', /### inject application/);
+        app.expect('stdout', /### inject agent/);
+      });
+    });
+    describe('array', () => {
+      before(() => {
+        app = utils.cluster('apps/options-require', {
+          require: [
+            path.join(__dirname, './fixtures/apps/options-require/inject.js'),
+            'ts-node/register',
+          ],
+        });
+        // app.debug();
+        return app.ready();
+      });
+      after(() => app.close());
+
+      it('should inject', () => {
+        app.expect('stdout', /### inject application/);
+        app.expect('stdout', /### inject agent/);
+        app.expect('stdout', /### inject ts-node\/register at app/);
+        app.expect('stdout', /### inject ts-node\/register at agent/);
+      });
+    });
+  });
 });
