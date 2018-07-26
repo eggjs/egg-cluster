@@ -1,4 +1,10 @@
 
+1.19.0 / 2018-07-26
+===================
+
+  * feat: support options.require (#73)
+  * feat: replace worker file from outside (#72)
+
 1.18.0 / 2018-06-12
 ===================
 
