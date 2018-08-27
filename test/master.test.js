@@ -279,6 +279,18 @@ describe('test/master.test.js', () => {
       yield sleep(1000);
       app.expect('stdout', /\d+ 'got'/);
     });
+
+    it('sendTo should work', function* () {
+      app = utils.cluster('apps/messenger');
+      // app.debug();
+      yield app.end();
+      app.proc.on('message', console.log);
+      yield sleep(1000);
+      app.expect('stdout', /app sendTo agent done/);
+      app.expect('stdout', /agent sendTo agent done/);
+      app.expect('stdout', /app sendTo app done/);
+      app.expect('stdout', /agent sendTo app done/);
+    });
   });
 
   describe('--cluster', () => {
