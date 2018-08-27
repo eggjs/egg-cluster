@@ -1,4 +1,10 @@
 
+1.19.1 / 2018-08-27
+==================
+
+**fixes**
+  * [[`b0c8d19`](http://github.com/eggjs/egg-cluster/commit/b0c8d19e08495c596045eada460590562a4150be)] - fix: fix messenger#sendTo (#74) (killa <<killa123@126.com>>)
+
 1.19.0 / 2018-07-26
 ===================
 
