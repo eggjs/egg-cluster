@@ -15,11 +15,25 @@ describe('test/options.test.js', () => {
     assert(options.port === undefined);
   });
 
-  it('should start with https and listen 8443', () => {
+
+  it('should options.{key|cert} NOT works', () => {
     const options = parseOptions({
       https: true,
       key: utils.getFilepath('server.key'),
       cert: utils.getFilepath('server.crt'),
+    });
+
+    assert(options.port === 8443);
+    assert(typeof options.https === 'undefined');
+  });
+
+
+  it('should start with https and listen 8443 with https.{key|cert}', () => {
+    const options = parseOptions({
+      https: {
+        key: utils.getFilepath('server.key'),
+        cert: utils.getFilepath('server.crt'),
+      },
     });
     assert(options.port === 8443);
     assert(options.https.key);
