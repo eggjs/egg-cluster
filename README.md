@@ -60,7 +60,7 @@ startCluster(options, () => {
 | port         | `Number`  | port                                     |
 | https        | `Object`  | start a https server, note: `key` / `cert` should be full path to file |
 | typescript   | `Boolean` | enable loader's typescript support       |
-| require      | `Array|String` | will inject into worker/agent process |
+| require      | `Array\|String` | will inject into worker/agent process |
 
 ## License
 
