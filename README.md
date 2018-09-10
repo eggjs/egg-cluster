@@ -58,7 +58,7 @@ startCluster(options, () => {
 | workers    | `Number`               | numbers of app workers                                                  |
 | sticky     | `Boolean`              | sticky mode server                                                      |
 | port       | `Number`               | port                                                                    |
-| https      | `SecureContextOptions` | start a https server, note: `key|cert|ca` must be absolute path if file |
+| https      | `SecureContextOptions` | start a https server, note: `key\|cert\|ca` must be absolute path if file |
 | typescript | `Boolean`              | enable loader's typescript support                                      |
 | require    | `Array\|String`        | will inject into worker/agent process                                   |
 
