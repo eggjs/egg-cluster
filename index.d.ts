@@ -19,4 +19,4 @@ export interface Options {
 }
 
 
-export function startCluster(options: Options, callback: (...args: any[]) => any): void;
+export function startCluster(options: Options, callback: () => void): void;
