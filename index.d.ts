@@ -1,7 +1,8 @@
 import { SecureContextOptions } from 'tls';
 
 
-export interface ClusterOptions {
+/** Cluster Options */
+export interface Options {
   /** specify framework that can be absolute path or npm package */
   framework?: string;
   /** directory of application, default to `process.cwd()` */
@@ -18,5 +19,4 @@ export interface ClusterOptions {
 }
 
 
-
-export function startCluster(options: ClusterOptions, callback: (...args: any[]) => any): void;
+export function startCluster(options: Options, callback: (...args: any[]) => any): void;
