@@ -219,6 +219,37 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
       app.expect('stdout', /INFO \d+ \[master\] wait 1000ms/);
     });
+
+    it('kill order', function* () {
+      mm.env('local');
+      mm(process.env, 'EGG_APP_WORKER_LOGGER_LEVEL', 'INFO');
+      mm(process.env, 'EGG_AGENT_WORKER_LOGGER_LEVEL', 'INFO');
+      mm(process.env, 'EGG_MASTER_LOGGER_LEVEL', 'DEBUG');
+      mm(process.env, 'EGG_APP_CLOSE_TIMEOUT', 1000);
+      mm(process.env, 'EGG_AGENT_CLOSE_TIMEOUT', 1000);
+      app = utils.cluster('apps/worker-close-timeout');
+
+      yield app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
+
+      app.proc.kill('SIGTERM');
+      yield awaitEvent(app.proc, 'exit');
+
+      app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
+      app.expect('stdout', /INFO \d+ \[master\] wait 1000ms/);
+      const appTimeoutMatch = app.stdout.match(/app worker start close: (\d+)/);
+      const agentTimeoutMatch = app.stdout.match(/agent worker start close: (\d+)/);
+      const appTimeout = Number(appTimeoutMatch && appTimeoutMatch[1]);
+      const agentTimeout = Number(agentTimeoutMatch && agentTimeoutMatch[1]);
+      assert(!Number.isNaN(appTimeout));
+      assert(!Number.isNaN(agentTimeout));
+      assert(agentTimeout - appTimeout > 1000);
+
+      assert(!/app worker never called after timeout/.test(app.stdout));
+      assert(!/agent worker never called after timeout/.test(app.stdout));
+    });
   });
 
   describe('Messenger', () => {

@@ -62,6 +62,12 @@ startCluster(options, () => {
 | typescript   | `Boolean` | enable loader's typescript support       |
 | require      | `Array\|String` | will inject into worker/agent process |
 
+## Env
+
+EGG_APP_CLOSE_TIMEOUT: app worker boot timeout value
+
+EGG_AGENT_CLOSE_TIMEOUT: agent worker boot timeout value
+
 ## License
 
 [MIT](LICENSE)
