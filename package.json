@@ -3,6 +3,7 @@
   "version": "1.20.0",
   "description": "cluster manager for egg",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "autod": "autod",
     "lint": "eslint .",
@@ -14,6 +15,7 @@
   },
   "files": [
     "index.js",
+    "index.d.ts",
     "lib"
   ],
   "repository": {

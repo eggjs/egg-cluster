@@ -50,17 +50,21 @@ startCluster(options, () => {
 
 ## Options
 
-| Param        | Type      | Description                              |
-| ------------ | --------- | ---------------------------------------- |
-| baseDir      | `String`  | directory of application                 |
-| framework    | `String`  | specify framework that can be absolute path or npm package |
-| plugins      | `Object`  | plugins for unittest                     |
-| workers      | `Number`  | numbers of app workers                   |
-| sticky       | `Boolean` | sticky mode server                       |
-| port         | `Number`  | port                                     |
-| https        | `Object`  | start a https server, note: `key` / `cert` should be full path to file |
-| typescript   | `Boolean` | enable loader's typescript support       |
-| require      | `Array\|String` | will inject into worker/agent process |
+| Param      | Type                   | Description                                                               |
+| ---------- | ---------------------- | ------------------------------------------------------------------------- |
+| baseDir    | `String`               | directory of application                                                  |
+| framework  | `String`               | specify framework that can be absolute path or npm package                |
+| plugins    | `Object`               | plugins for unittest                                                      |
+| workers    | `Number`               | numbers of app workers                                                    |
+| sticky     | `Boolean`              | sticky mode server                                                        |
+| port       | `Number`               | port                                                                      |
+| https      | `SecureContextOptions` | start a https server, note: `key\|cert\|ca` must be absolute path if file |
+| typescript | `Boolean`              | enable loader's typescript support                                        |
+| require    | `Array\|String`        | will inject into worker/agent process                                     |
+
+## References
+
+- [SecureContextOptions](https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options)
 
 ## Env
 
