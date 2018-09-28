@@ -18,14 +18,14 @@ describe('test/agent_worker.test.js', () => {
       mm(process.env, 'EGG_AGENT_DEBUG_PORT', '15800');
       app = utils.cluster('apps/agent-debug-port', { isDebug: true });
       return app
-        .expect('stuout', /15800/)
+        .expect('stdout', /15800/)
         .end();
     });
 
     it('agent debug port default 5800', () => {
       app = utils.cluster('apps/agent-debug-port', { isDebug: true });
       return app
-        .expect('stuout', /5800/)
+        .expect('stdout', /5800/)
         .end();
     });
 

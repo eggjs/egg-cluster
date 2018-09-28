@@ -35,11 +35,18 @@ describe('test/app_worker.test.js', () => {
     });
 
     it('should exit when emit error during app worker boot', () => {
-      app = utils.cluster('apps/app-start-error');
+      app = utils.cluster('apps/app-start-error', {
+        opt: {
+          env: Object.assign({}, process.env, {
+            EGG_APP_WORKER_LOGGER_LEVEL: 'INFO',
+          }),
+        },
+      });
 
       return app
         // .debug()
         .expect('code', 1)
+        .expect('stdout', /\[app_worker] beforeExit success/)
         .end();
     });
 
