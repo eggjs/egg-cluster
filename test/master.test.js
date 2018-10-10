@@ -256,7 +256,7 @@ describe('test/master.test.js', () => {
       app = utils.cluster('apps/sub-process');
 
       yield app.expect('stdout', /egg start/)
-        // .debug()
+        .debug()
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
