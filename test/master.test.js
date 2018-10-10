@@ -251,21 +251,22 @@ describe('test/master.test.js', () => {
       assert(!/agent worker never called after timeout/.test(app.stdout));
     });
 
-    it.only('close master will terminate all sub processes', function* () {
+    it('close master will terminate all sub processes', function* () {
       mm.env('local');
       app = utils.cluster('apps/sub-process');
 
       yield app.expect('stdout', /egg start/)
-        .debug()
+        // .debug()
         .expect('stdout', /egg started/)
-        .expect('stdout', /worker1 \[\d+\] started/)
-        .expect('stdout', /worker2 \[\d+\] started/)
         .expect('code', 0)
         .end();
 
       app.proc.kill('SIGTERM');
       yield sleep(10000);
       assert(app.proc.killed === true);
+      app.expect('stdout', /worker1 \[\d+\] started/);
+      app.expect('stdout', /worker2 \[\d+\] started/);
+
       app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
       app.expect('stdout', /\[master\] exit with code:0/);
       app.expect('stdout', /worker1 on sigterm and not exit/);
