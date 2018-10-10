@@ -1,4 +1,10 @@
 
+1.22.0 / 2018-10-10
+==================
+
+**features**
+  * [[`2b662a5`](http://github.com/eggjs/egg-cluster/commit/2b662a5d5a86cebf1096648afe473a96ce09b498)] - feat: kill all sub processes when exit (#79) (Yiyu He <<dead_horse@qq.com>>)
+
 1.21.0 / 2018-09-28
 ===================
 
