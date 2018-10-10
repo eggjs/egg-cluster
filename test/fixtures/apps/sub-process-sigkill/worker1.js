@@ -7,6 +7,5 @@ setTimeout(() => {
 }, 4000);
 
 process.on('SIGTERM', () => {
-  console.log('worker1 on sigterm and exit');
-  process.exit(0);
+  console.log('worker1 on sigterm and not exit');
 });
