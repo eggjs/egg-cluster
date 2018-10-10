@@ -6,10 +6,6 @@ setTimeout(() => {
   console.log('worker1 alived');
 }, 4000);
 
-setTimeout(() => {
-  console.log('worker1 still alived');
-}, 8000);
-
 process.on('SIGTERM', () => {
   console.log('worker1 on sigterm and not exit');
 });

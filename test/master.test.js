@@ -251,7 +251,7 @@ describe('test/master.test.js', () => {
       assert(!/agent worker never called after timeout/.test(app.stdout));
     });
 
-    it('close master will terminate all sub processes', function* () {
+    it.only('close master will terminate all sub processes', function* () {
       mm.env('local');
       app = utils.cluster('apps/sub-process');
 
@@ -261,8 +261,9 @@ describe('test/master.test.js', () => {
         .expect('code', 0)
         .end();
 
+      yield sleep(3000);
       app.proc.kill('SIGTERM');
-      yield sleep(10000);
+      yield sleep(5000);
       assert(app.proc.killed === true);
       app.expect('stdout', /worker1 \[\d+\] started/);
       app.expect('stdout', /worker2 \[\d+\] started/);
@@ -274,8 +275,12 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /worker1 alived/);
 
       // worker1 and worker2 are both exit
-      app.notExpect('stdout', /worker1 still alived/);
-      app.notExpect('stdout', /worker2 still alived/);
+      let res = app.stdout.match(/worker1 \[(\d+)\] started/);
+      const pid1 = res && res[1];
+      res = app.stdout.match(/worker2 \[(\d+)\] started/);
+      const pid2 = res && res[1];
+      assert(!alive(pid1));
+      assert(!alive(pid2));
     });
   });
 
@@ -829,3 +834,14 @@ describe('test/master.test.js', () => {
     });
   });
 });
+
+function alive(pid) {
+  try {
+    // success means it's still alive
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    // error means it's dead
+    return false;
+  }
+}
