@@ -250,6 +250,32 @@ describe('test/master.test.js', () => {
       assert(!/app worker never called after timeout/.test(app.stdout));
       assert(!/agent worker never called after timeout/.test(app.stdout));
     });
+
+    it('close master will terminate all sub processes', function* () {
+      mm.env('local');
+      app = utils.cluster('apps/sub-process');
+
+      yield app.expect('stdout', /egg start/)
+        // .debug()
+        .expect('stdout', /egg started/)
+        .expect('stdout', /worker1 \[\d+\] started/)
+        .expect('stdout', /worker2 \[\d+\] started/)
+        .expect('code', 0)
+        .end();
+
+      app.proc.kill('SIGTERM');
+      yield sleep(10000);
+      assert(app.proc.killed === true);
+      app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] exit with code:0/);
+      app.expect('stdout', /worker1 on sigterm and not exit/);
+      app.expect('stdout', /worker2 on sigterm and exit/);
+      app.expect('stdout', /worker1 alived/);
+
+      // worker1 and worker2 are both exit
+      app.notExpect('stdout', /worker1 still alived/);
+      app.notExpect('stdout', /worker2 still alived/);
+    });
   });
 
   describe('Messenger', () => {
