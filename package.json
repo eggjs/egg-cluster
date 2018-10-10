@@ -45,6 +45,7 @@
     "graceful-process": "^1.2.0",
     "is-type-of": "^1.2.0",
     "mz-modules": "^2.1.0",
+    "ps-tree": "^1.1.0",
     "semver": "^5.5.0",
     "sendmessage": "^1.1.0",
     "utility": "^1.13.1"
@@ -55,7 +56,6 @@
     "coffee": "^4.1.0",
     "egg": "^2.8.1",
     "egg-bin": "^4.7.0",
-    "egg-ci": "^1.8.0",
     "egg-mock": "^3.17.1",
     "eslint": "^4.19.1",
     "eslint-config-egg": "^7.0.0",
