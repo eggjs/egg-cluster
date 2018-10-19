@@ -39,6 +39,16 @@ describe('test/agent_worker.test.js', () => {
         .end();
     });
 
+    it('should not start app when error happened during agent starting', () => {
+      app = utils.cluster('apps/agent-die-onboot');
+      return app
+        .expect('code', 1)
+        .expect('stderr', /\[master\] agent_worker#1:\d+ start fail, exiting with code:1/)
+        .expect('stderr', /error: app worker throw/)
+        .notExpect('stdout', /agent\-error\-but\-app\-start/)
+        .end();
+    });
+
     it('should refork new agent_worker after app started', function* () {
       app = utils.cluster('apps/agent-die');
       yield app
