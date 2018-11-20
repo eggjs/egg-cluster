@@ -15,7 +15,10 @@ const Master = require('./lib/master');
  * @method Egg#startCluster
  * @param {Object} options {@link Master}
  * @param {Function} callback start success callback
+ * @return {Object} - master
  */
 exports.startCluster = function(options, callback) {
-  new Master(options).ready(callback);
+  const master = new Master(options);
+  master.ready(callback);
+  return master;
 };
