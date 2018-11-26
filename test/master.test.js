@@ -10,6 +10,7 @@ const request = require('supertest');
 const semver = require('semver');
 const awaitEvent = require('await-event');
 const fs = require('mz/fs');
+const cp = require('child_process');
 const utils = require('./utils');
 
 describe('test/master.test.js', () => {
@@ -384,6 +385,33 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /agent sendTo agent done/);
       app.expect('stdout', /app sendTo app done/);
       app.expect('stdout', /agent sendTo app done/);
+    });
+
+    it('egg-script exit', function* () {
+      app = {
+        close: () => {},
+      };
+      const appDir = path.join(__dirname, 'fixtures/apps/script-start');
+      const errLogPath = path.join(appDir, 'stderr.log');
+      const errFd = fs.openSync(errLogPath, 'w+');
+      const p = cp.fork(path.join(appDir, 'start-server.js'), {
+        stdio: [
+          'ignore',
+          'ignore',
+          errFd,
+          'ipc',
+        ],
+      });
+      let masterPid;
+      p.on('message', msg => {
+        masterPid = msg;
+      });
+      yield sleep(5000);
+      process.kill(masterPid);
+      process.kill(p.pid);
+      fs.closeSync(errFd);
+      const stderr = fs.readFileSync(errLogPath).toString();
+      assert(!/channel closed/.test(stderr));
     });
   });
 
