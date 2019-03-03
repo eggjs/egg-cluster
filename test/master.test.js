@@ -4,8 +4,7 @@ const path = require('path');
 const mm = require('egg-mock');
 const assert = require('assert');
 const pedding = require('pedding');
-const sleep = require('mz-modules/sleep');
-const mkdirp = require('mz-modules/mkdirp');
+const { mkdirp, rimraf, sleep } = require('mz-modules');
 const request = require('supertest');
 const semver = require('semver');
 const awaitEvent = require('await-event');
@@ -313,6 +312,55 @@ describe('test/master.test.js', () => {
       const pid2 = res && res[1];
       assert(!alive(pid1));
       assert(!alive(pid2));
+    });
+  });
+
+  describe('pid file', () => {
+    const runDir = path.join(__dirname, './fixtures/apps/master-worker-started/run');
+    const pidFile = path.join(runDir, './pid');
+
+    beforeEach(() => rimraf(runDir));
+    afterEach(() => app.close());
+
+    it('master should write pid file and delete', function* () {
+      app = utils.cluster('apps/master-worker-started', { pidFile });
+      // app.debug();
+
+      yield app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
+
+      assert(fs.existsSync(pidFile));
+      const pid = yield fs.readFile(pidFile, 'utf-8');
+      assert(pid === String(app.process.pid));
+
+      app.proc.kill('SIGTERM');
+      yield sleep(6000);
+      app.expect('stdout', /\[master\] exit with code:0/);
+      assert(!fs.existsSync(pidFile));
+    });
+
+    it('master should ignore fail when delete pid file ', function* () {
+      app = utils.cluster('apps/master-worker-started', { pidFile });
+      // app.debug();
+
+      yield app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
+
+      assert(fs.existsSync(pidFile));
+      const pid = yield fs.readFile(pidFile, 'utf-8');
+      assert(pid === String(app.process.pid));
+
+      // delete
+      fs.unlinkSync(pidFile);
+
+      app.proc.kill('SIGTERM');
+      yield sleep(6000);
+      app.expect('stdout', /\[master\] exit with code:0/);
+      assert(!fs.existsSync(pidFile));
     });
   });
 
