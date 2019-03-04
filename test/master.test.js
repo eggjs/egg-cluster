@@ -4,12 +4,12 @@ const path = require('path');
 const mm = require('egg-mock');
 const assert = require('assert');
 const pedding = require('pedding');
-const sleep = require('mz-modules/sleep');
-const mkdirp = require('mz-modules/mkdirp');
+const { mkdirp, rimraf, sleep } = require('mz-modules');
 const request = require('supertest');
 const semver = require('semver');
 const awaitEvent = require('await-event');
 const fs = require('mz/fs');
+const cp = require('child_process');
 const utils = require('./utils');
 
 describe('test/master.test.js', () => {
@@ -315,6 +315,55 @@ describe('test/master.test.js', () => {
     });
   });
 
+  describe('pid file', () => {
+    const runDir = path.join(__dirname, './fixtures/apps/master-worker-started/run');
+    const pidFile = path.join(runDir, './pid');
+
+    beforeEach(() => rimraf(runDir));
+    afterEach(() => app.close());
+
+    it('master should write pid file and delete', function* () {
+      app = utils.cluster('apps/master-worker-started', { pidFile });
+      // app.debug();
+
+      yield app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
+
+      assert(fs.existsSync(pidFile));
+      const pid = yield fs.readFile(pidFile, 'utf-8');
+      assert(pid === String(app.process.pid));
+
+      app.proc.kill('SIGTERM');
+      yield sleep(6000);
+      app.expect('stdout', /\[master\] exit with code:0/);
+      assert(!fs.existsSync(pidFile));
+    });
+
+    it('master should ignore fail when delete pid file ', function* () {
+      app = utils.cluster('apps/master-worker-started', { pidFile });
+      // app.debug();
+
+      yield app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started/)
+        .expect('code', 0)
+        .end();
+
+      assert(fs.existsSync(pidFile));
+      const pid = yield fs.readFile(pidFile, 'utf-8');
+      assert(pid === String(app.process.pid));
+
+      // delete
+      fs.unlinkSync(pidFile);
+
+      app.proc.kill('SIGTERM');
+      yield sleep(6000);
+      app.expect('stdout', /\[master\] exit with code:0/);
+      assert(!fs.existsSync(pidFile));
+    });
+  });
+
   describe('Messenger', () => {
     afterEach(() => app.close());
 
@@ -384,6 +433,33 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /agent sendTo agent done/);
       app.expect('stdout', /app sendTo app done/);
       app.expect('stdout', /agent sendTo app done/);
+    });
+
+    it('egg-script exit', function* () {
+      app = {
+        close: () => {},
+      };
+      const appDir = path.join(__dirname, 'fixtures/apps/script-start');
+      const errLogPath = path.join(appDir, 'stderr.log');
+      const errFd = fs.openSync(errLogPath, 'w+');
+      const p = cp.fork(path.join(appDir, 'start-server.js'), {
+        stdio: [
+          'ignore',
+          'ignore',
+          errFd,
+          'ipc',
+        ],
+      });
+      let masterPid;
+      p.on('message', msg => {
+        masterPid = msg;
+      });
+      yield sleep(5000);
+      process.kill(masterPid);
+      process.kill(p.pid);
+      fs.closeSync(errFd);
+      const stderr = fs.readFileSync(errLogPath).toString();
+      assert(!/channel closed/.test(stderr));
     });
   });
 

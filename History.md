@@ -1,4 +1,19 @@
 
+1.23.0 / 2019-03-04
+==================
+
+**features**
+  * [[`8740538`](http://github.com/eggjs/egg-cluster/commit/874053871bd8f28d27c8f82aae1bc3a1b8f4e98d)] - feat: save pid file (#87) (TZ | 天猪 <<atian25@qq.com>>)
+
+1.22.2 / 2018-12-04
+==================
+
+**fixes**
+  * [[`99d0c6b`](http://github.com/eggjs/egg-cluster/commit/99d0c6b6927add7536f505ba7e128a3c5c33475d)] - fix: master should not send to parent when egg-script is closed (#84) (killa <<killa123@126.com>>)
+
+**others**
+  * [[`5920799`](http://github.com/eggjs/egg-cluster/commit/5920799dd7db9ea107723dd4794c2223463c2d8c)] - docs: remove `options.typescript` (#82) (吖猩 <<whxaxes@qq.com>>)
+
 1.22.1 / 2018-10-19
 ===================
 
