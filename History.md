@@ -1,4 +1,10 @@
 
+1.23.0 / 2019-03-04
+==================
+
+**features**
+  * [[`8740538`](http://github.com/eggjs/egg-cluster/commit/874053871bd8f28d27c8f82aae1bc3a1b8f4e98d)] - feat: save pid file (#87) (TZ | 天猪 <<atian25@qq.com>>)
+
 1.22.2 / 2018-12-04
 ==================
 
