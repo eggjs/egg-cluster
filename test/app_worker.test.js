@@ -223,7 +223,7 @@ describe('test/app_worker.test.js', () => {
           .expect(200);
         throw new Error('should not run');
       } catch (err) {
-        assert(err.message === 'ECONNREFUSED: Connection refused');
+        assert(err.code === 'ECONNREFUSED');
       }
     });
 
