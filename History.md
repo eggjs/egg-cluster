@@ -1,4 +1,10 @@
 
+1.23.1 / 2019-03-12
+==================
+
+**others**
+  * [[`45d956f`](http://github.com/eggjs/egg-cluster/commit/45d956f9f29610da9316e5c5e8335c608e985739)] - chore: update all dependencies (#88) (Yiyu He <<dead_horse@qq.com>>)
+
 1.23.0 / 2019-03-04
 ==================
 
