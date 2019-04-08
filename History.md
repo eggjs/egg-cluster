@@ -1,4 +1,10 @@
 
+1.23.2 / 2019-04-08
+==================
+
+**fixes**
+  * [[`de95e90`](http://github.com/eggjs/egg-cluster/commit/de95e907637aa6aa3b143e37fcccf457d9f53df8)] - fix: should destroy socket when receives an RST after the three-way handshake. (#89) (ngot <<zhuanghengfei@gmail.com>>)
+
 1.23.1 / 2019-03-12
 ==================
 
