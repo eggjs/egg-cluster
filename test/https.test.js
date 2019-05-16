@@ -29,11 +29,12 @@ describe('test/https.test.js', () => {
       yield app.ready();
 
       const response = yield urllib.request('https://127.0.0.1:8443', {
+        dataType: 'text',
         rejectUnauthorized: false,
       });
 
       assert(response.status === 200);
-      assert(response.data.toString(), 'https server');
+      assert(response.data === 'https server');
     });
 
   });

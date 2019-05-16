@@ -218,9 +218,9 @@ describe('test/app_worker.test.js', () => {
         .expect(200);
 
       try {
-        const response = yield urllib.request('http://127.0.0.1:17010');
+        const response = yield urllib.request('http://127.0.0.1:17010', { dataType: 'text' });
         assert(response.code === 200);
-        assert(response.data.toString() === 'done');
+        assert(response.data === 'done');
         throw new Error('should not run');
       } catch (err) {
         assert(/ECONNREFUSED/.test(err.message));
