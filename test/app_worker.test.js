@@ -219,7 +219,7 @@ describe('test/app_worker.test.js', () => {
 
       try {
         const response = yield urllib.request('http://127.0.0.1:17010', { dataType: 'text' });
-        assert(response.code === 200);
+        assert(response.status === 200);
         assert(response.data === 'done');
         throw new Error('should not run');
       } catch (err) {
