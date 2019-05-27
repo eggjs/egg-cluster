@@ -12,7 +12,7 @@ const Master = require('./lib/master');
 
 /**
  * start egg app
- * @method Egg#startCluster
+ * @function Egg#startCluster
  * @param {Object} options {@link Master}
  * @param {Function} callback start success callback
  */

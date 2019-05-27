@@ -223,7 +223,7 @@ describe('test/app_worker.test.js', () => {
           .expect(200);
         throw new Error('should not run');
       } catch (err) {
-        assert(err.code === 'ECONNREFUSED');
+        assert(/ECONNREFUSED/.test(err.message));
       }
     });
 

@@ -828,6 +828,7 @@ describe('test/master.test.js', () => {
     after(() => app.close());
 
     it('should online sticky cluster mode startup success', () => {
+      app.expect('stdout', /app_worker#\d:\d+ started at (?!9500)/);
       app.expect('stdout', /egg started on http:\/\/127.0.0.1:17010/);
       return request('http://127.0.0.1:17010')
         .get('/portal/i.htm')
