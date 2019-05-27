@@ -1,4 +1,10 @@
 
+1.23.3 / 2019-05-27
+==================
+
+**fixes**
+  * [[`0f7558b`](http://github.com/eggjs/egg-cluster/commit/0f7558b24b5d6e37259a02c62cf4b92d678f3ee0)] - fix: should not ready when call server.listen in sticky mode (#91) (killa <<killa123@126.com>>)
+
 1.23.2 / 2019-04-08
 ==================
 
