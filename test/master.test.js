@@ -420,7 +420,7 @@ describe('test/master.test.js', () => {
       // app.debug();
       yield app.end();
       yield sleep(1000);
-      app.expect('stdout', /\d+ got/);
+      app.expect('stdout', /\d+ '?got'?/);
     });
 
     it('sendTo should work', function* () {
