@@ -68,28 +68,6 @@ describe('test/options.test.js', () => {
     assert(options.port === undefined);
   });
 
-  it('should false/false/false/true value when windowsHide is null/undefined/false/true', () => {
-    let options = parseOptions({
-      windowsHide: null,
-    });
-    assert(options.windowsHide === false);
-
-    options = parseOptions({
-      windowsHide: undefined,
-    });
-    assert(options.windowsHide === false);
-
-    options = parseOptions({
-      windowsHide: false,
-    });
-    assert(options.windowsHide === false);
-
-    options = parseOptions({
-      windowsHide: true,
-    });
-    assert(options.windowsHide === true);
-  });
-
   it('should not call os.cpus when specify workers', () => {
     mm.syncError(os, 'cpus', 'should not call os.cpus');
     const options = parseOptions({
