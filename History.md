@@ -1,4 +1,10 @@
 
+1.24.0 / 2019-06-14
+==================
+
+**features**
+  * [[`4b47bec`](http://github.com/eggjs/egg-cluster/commit/4b47becda40f72d260f7f101791371c803968533)] - feat: add windowsHide support (#92) (QingDeng <<zrl412@163.com>>)
+
 1.23.3 / 2019-05-27
 ==================
 
