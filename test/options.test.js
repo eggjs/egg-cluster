@@ -32,7 +32,7 @@ describe('test/options.test.js', () => {
       https: {
         passphrase: '123456',
         key: utils.getFilepath('server.key'),
-        cert: utils.getFilepath('server.crt'),
+        cert: utils.getFilepath('server.cert'),
         ca: utils.getFilepath('server.ca'),
       },
     });
