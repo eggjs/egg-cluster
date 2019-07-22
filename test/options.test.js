@@ -17,9 +17,10 @@ describe('test/options.test.js', () => {
 
   it('should start with https and listen 8443', () => {
     const options = parseOptions({
-      https: true,
-      key: utils.getFilepath('server.key'),
-      cert: utils.getFilepath('server.crt'),
+      https: {
+        key: utils.getFilepath('server.key'),
+        cert: utils.getFilepath('server.cert'),
+      },
     });
     assert(options.port === 8443);
     assert(options.https.key);
@@ -31,7 +32,7 @@ describe('test/options.test.js', () => {
       https: {
         passphrase: '123456',
         key: utils.getFilepath('server.key'),
-        cert: utils.getFilepath('server.crt'),
+        cert: utils.getFilepath('server.cert'),
       },
     });
     assert(options.port === 8443);

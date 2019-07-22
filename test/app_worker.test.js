@@ -4,6 +4,7 @@ const mm = require('egg-mock');
 const sleep = require('mz-modules/sleep');
 const rimraf = require('mz-modules/rimraf');
 const request = require('supertest');
+const urllib = require('urllib');
 const address = require('address');
 const assert = require('assert');
 const utils = require('./utils');
@@ -217,10 +218,9 @@ describe('test/app_worker.test.js', () => {
         .expect(200);
 
       try {
-        yield request('http://127.0.0.1:17010')
-          .get('/')
-          .expect('done')
-          .expect(200);
+        const response = yield urllib.request('http://127.0.0.1:17010', { dataType: 'text' });
+        assert(response.status === 200);
+        assert(response.data === 'done');
         throw new Error('should not run');
       } catch (err) {
         assert(/ECONNREFUSED/.test(err.message));
