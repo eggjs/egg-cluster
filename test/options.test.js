@@ -32,12 +32,14 @@ describe('test/options.test.js', () => {
       https: {
         passphrase: '123456',
         key: utils.getFilepath('server.key'),
-        cert: utils.getFilepath('server.cert'),
+        cert: utils.getFilepath('server.crt'),
+        ca: utils.getFilepath('server.ca'),
       },
     });
     assert(options.port === 8443);
     assert(options.https.key);
     assert(options.https.cert);
+    assert(options.https.ca);
     assert(options.https.passphrase);
   });
 

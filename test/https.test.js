@@ -23,6 +23,7 @@ describe('test/https.test.js', () => {
         https: {
           key: utils.getFilepath('server.key'),
           cert: utils.getFilepath('server.cert'),
+          ca: utils.getFilepath('server.ca'),
         },
       };
       app = utils.cluster('apps/https-server', options);
