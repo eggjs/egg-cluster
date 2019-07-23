@@ -588,8 +588,7 @@ describe('test/master.test.js', () => {
     it('should every app worker will get message', function* () {
       yield sleep(1000);
       // start two workers
-      app.expect('stdout', /#1 agent get 1 workers \[ \d+ \]/);
-      app.expect('stdout', /#2 agent get 2 workers \[ \d+, \d+ \]/);
+      app.expect('stdout', /agent get 2 workers \[ \d+, \d+ \]/);
     });
 
     it('agent should get update message after app died', function* () {
@@ -834,6 +833,32 @@ describe('test/master.test.js', () => {
         .get('/portal/i.htm')
         .expect('hi cluster')
         .expect(200);
+    });
+  });
+
+  describe('--nginx-sticky', () => {
+    before(() => {
+      app = utils.cluster('apps/cluster_mod_nginx_sticky', {
+        nginxSticky: true,
+        workers: 2,
+      });
+      app.debug();
+      return app.ready();
+    });
+
+    after(() => app.close());
+
+    it('should listen multi port', function* () {
+      app.expect('stdout', /\[master] egg started on \["http:\/\/127\.0\.0\.1:17011|2","http:\/\/127\.0\.0\.1:17012|1"]/);
+      const urls = [
+        'http://127.0.0.1:17011',
+        'http://127.0.0.1:17012',
+      ];
+      yield Promise.all(urls.map(t =>
+        request(t).get('/portal/i.htm')
+          .expect('hi cluster')
+          .expect(200)
+      ));
     });
   });
 
