@@ -1,4 +1,13 @@
 
+1.25.0 / 2019-07-24
+==================
+
+**features**
+  * [[`7fca260`](http://github.com/eggjs/egg-cluster/commit/7fca2606ae4be84c69af47d64227ca474e67ea70)] - feat: suppport config.cluster.https (#90) (TZ | 天猪 <<atian25@qq.com>>)
+
+**fixes**
+  * [[`5547a87`](http://github.com/eggjs/egg-cluster/commit/5547a877078b13dadde8b7fef94347dc18272eff)] - fix: add ca opiton if https (#93) (dxd <<dxd_sjtu@outlook.com>>)
+
 1.24.0 / 2019-06-14
 ==================
 
