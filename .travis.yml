@@ -1,19 +1,20 @@
 sudo: false
 language: node_js
 node_js:
-  - '6'
-  - '8'
-  - '10'
-  - '12'
+  - "6"
+  - "8"
+  - "10"
+  - "12"
 env:
   - EGG_VERSION=1
   - EGG_VERSION=2
 matrix:
   exclude:
-  - node_js: '6'
-    env: EGG_VERSION=2
+    - node_js: "6"
+      env: EGG_VERSION=2
+before_install:
+  - npm install npminstall -g
 install:
-  - npm i npminstall
   - sed -i.bak '/"egg":/d' package.json
   - npminstall -d
 script:
