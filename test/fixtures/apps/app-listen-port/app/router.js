@@ -6,6 +6,6 @@ module.exports = app => {
   });
 
   app.get('/port', function* () {
-    this.body = this.app._options.port;
+    this.body = this.app.options.port;
   });
 };
