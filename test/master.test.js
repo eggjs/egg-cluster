@@ -45,6 +45,38 @@ describe('test/master.test.js', () => {
           done();
         });
     });
+
+    it('should print process.on.HOST while egg started', done => {
+      mm.env('prod');
+      mm(process.env, 'HOST', 'xxx.com');
+      app = utils.cluster('apps/mock-production-app').debug(false);
+
+      app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started on http:\/\/xxx\.com:/)
+        .expect('code', 0)
+        .end(err => {
+          assert.ifError(err);
+          console.log(app.stdout);
+          console.log(app.stderr);
+          done();
+        });
+    });
+
+    it('should not print process.on.HOST if it equals 0.0.0.0', done => {
+      mm.env('prod');
+      mm(process.env, 'HOST', '0.0.0.0');
+      app = utils.cluster('apps/mock-production-app').debug(false);
+
+      app.expect('stdout', /egg start/)
+        .expect('stdout', /egg started on http:\/\/127\.0\.0\.1:/)
+        .expect('code', 0)
+        .end(err => {
+          assert.ifError(err);
+          console.log(app.stdout);
+          console.log(app.stderr);
+          done();
+        });
+    });
   });
 
   describe('close master', () => {
