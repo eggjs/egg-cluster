@@ -1,4 +1,10 @@
 
+1.26.0 / 2019-11-18
+==================
+
+**features**
+  * [[`63c3cd0`](http://github.com/eggjs/egg-cluster/commit/63c3cd0dcbd5d3ca8d6b6c5bf08c85f4dd698d25)] - feat: print process.env.HOST while egg started (#96) (zōng yǔ <<gxcsoccer@users.noreply.github.com>>)
+
 1.25.0 / 2019-07-24
 ==================
 
