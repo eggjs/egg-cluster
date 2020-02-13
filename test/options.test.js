@@ -4,6 +4,7 @@ const path = require('path');
 const assert = require('assert');
 const os = require('os');
 const mm = require('egg-mock');
+const semver = require('semver');
 const parseOptions = require('../lib/utils/options');
 const utils = require('./utils');
 
@@ -202,4 +203,64 @@ describe('test/options.test.js', () => {
       }
     });
   });
+
+  describe('should options.serialization', () => {
+    it('should with "json" value when Node.js >= v12.16.0', () => {
+      if (semver.gte(process.version, '12.16.0')) {
+        const options = parseOptions({
+          serialization: 'json',
+        });
+        assert(options.serialization === 'json');
+      }
+    });
+
+    it('should with "advanced" value when Node.js >= v12.16.0', () => {
+      if (semver.gte(process.version, '12.16.0')) {
+        const options = parseOptions({
+          serialization: 'advanced',
+        });
+        assert(options.serialization === 'advanced');
+      }
+    });
+
+    it('should error with invalid value when Node.js >= v12.16.0', () => {
+      if (semver.gte(process.version, '12.16.0')) {
+        try {
+          parseOptions({
+            serialization: 'fake',
+          });
+          assert(false);
+        } catch (ex) {
+          assert(ex.message.includes('must be "json" or "advanced"'));
+        }
+      }
+    });
+
+    it('should error with empty value when Node.js >= v12.16.0', () => {
+      if (semver.gte(process.version, '12.16.0')) {
+        try {
+          parseOptions({
+            serialization: '',
+          });
+          assert(false);
+        } catch (ex) {
+          assert(ex.message.includes('must be "json" or "advanced"'));
+        }
+      }
+    });
+
+    it('should error with value when Node.js < v12.16.0', () => {
+      if (!semver.gte(process.version, '12.16.0')) {
+        try {
+          parseOptions({
+            serialization: 'json',
+          });
+          assert(false);
+        } catch (ex) {
+          assert(ex.message.includes('requires Node.js >= v12.16.0'));
+        }
+      }
+    });
+  });
+
 });
