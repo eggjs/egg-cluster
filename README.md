@@ -50,17 +50,18 @@ startCluster(options, () => {
 
 ## Options
 
-| Param        | Type      | Description                              |
-| ------------ | --------- | ---------------------------------------- |
-| baseDir      | `String`  | directory of application                 |
-| framework    | `String`  | specify framework that can be absolute path or npm package |
-| plugins      | `Object`  | plugins for unittest                     |
-| workers      | `Number`  | numbers of app workers                   |
-| sticky       | `Boolean` | sticky mode server                       |
-| port         | `Number`  | port                                     |
-| https        | `Object`  | start a https server, note: `key` / `cert` / `ca` should be full path to file |
-| require      | `Array\|String` | will inject into worker/agent process |
-| pidFile      | `String`  | will save master pid to this file |
+| Param           | Type            | Description                                                                   |
+| --------------- | --------------- | ----------------------------------------------------------------------------- |
+| baseDir         | `String`        | directory of application                                                      |
+| framework       | `String`        | specify framework that can be absolute path or npm package                    |
+| plugins         | `Object`        | plugins for unittest                                                          |
+| workers         | `Number`        | numbers of app workers                                                        |
+| sticky          | `Boolean`       | sticky mode server                                                            |
+| port            | `Number`        | port                                                                          |
+| https           | `Object`        | start a https server, note: `key` / `cert` / `ca` should be full path to file |
+| require         | `Array\|String` | will inject into worker/agent process                                         |
+| pidFile         | `String`        | will save master pid to this file                                             |
+| [serialization] | `json|advanced` | default: 'json'. 'advanced' requires Node.js >= 10.16.0                       |
 
 ## Env
 
@@ -71,3 +72,5 @@ EGG_AGENT_CLOSE_TIMEOUT: agent worker boot timeout value
 ## License
 
 [MIT](LICENSE)
+
+[serialization]:https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V12.md#advanced-serialization-for-ipc
