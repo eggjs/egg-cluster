@@ -205,8 +205,15 @@ describe('test/options.test.js', () => {
   });
 
   describe('should options.serialization', () => {
-    it('should with "json" value when Node.js >= v12.16.0', () => {
-      if (semver.gte(process.version, '12.16.0')) {
+    let isSupportSerialization = false;
+    if ((semver.gte(process.version, '12.16.0') && semver.lt(process.version, '13.0.0'))
+      || semver.gte(process.version, '13.2.0')
+    ) {
+      isSupportSerialization = true;
+    }
+
+    it('should with "json" value when Node.js supports serialization', () => {
+      if (isSupportSerialization) {
         const options = parseOptions({
           serialization: 'json',
         });
@@ -214,8 +221,8 @@ describe('test/options.test.js', () => {
       }
     });
 
-    it('should with "advanced" value when Node.js >= v12.16.0', () => {
-      if (semver.gte(process.version, '12.16.0')) {
+    it('should with "advanced" value when Node.js supports serialization', () => {
+      if (isSupportSerialization) {
         const options = parseOptions({
           serialization: 'advanced',
         });
@@ -223,8 +230,8 @@ describe('test/options.test.js', () => {
       }
     });
 
-    it('should error with invalid value when Node.js >= v12.16.0', () => {
-      if (semver.gte(process.version, '12.16.0')) {
+    it('should error with invalid value when Node.js supports serialization', () => {
+      if (isSupportSerialization) {
         try {
           parseOptions({
             serialization: 'fake',
@@ -236,8 +243,8 @@ describe('test/options.test.js', () => {
       }
     });
 
-    it('should error with empty value when Node.js >= v12.16.0', () => {
-      if (semver.gte(process.version, '12.16.0')) {
+    it('should error with empty value when Node.js supports serialization', () => {
+      if (isSupportSerialization) {
         try {
           parseOptions({
             serialization: '',
@@ -249,8 +256,8 @@ describe('test/options.test.js', () => {
       }
     });
 
-    it('should error with value when Node.js < v12.16.0', () => {
-      if (!semver.gte(process.version, '12.16.0')) {
+    it('should error with value when Node.js not supports serialization', () => {
+      if (!isSupportSerialization) {
         try {
           parseOptions({
             serialization: 'json',
