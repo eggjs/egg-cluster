@@ -1,24 +1,15 @@
 sudo: false
 language: node_js
 node_js:
-  - "6"
   - "8"
   - "10"
   - "12"
-env:
-  - EGG_VERSION=1
-  - EGG_VERSION=2
-matrix:
-  exclude:
-    - node_js: "6"
-      env: EGG_VERSION=2
+  - "14"
 before_install:
   - npm install npminstall -g
 install:
-  - sed -i.bak '/"egg":/d' package.json
   - npminstall -d
 script:
-  - eval "npminstall -d egg@$EGG_VERSION"
   - npm run ci
 after_script:
   - npminstall codecov && codecov
