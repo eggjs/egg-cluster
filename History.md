@@ -1,4 +1,10 @@
 
+1.27.0 / 2021-04-05
+==================
+
+**features**
+  * [[`36f3a05`](https://github.com/eggjs/egg-cluster.git/commit/36f3a05e396ba1c82e4c1d961aca91d09800d294)] - feat: catch app/agent boot error to formater FrameworkError (#98) (mansonchor.github.com <<mansonchor1987@gmail.com>>)
+
 1.26.0 / 2019-11-18
 ==================
 
