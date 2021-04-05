@@ -51,6 +51,38 @@ describe('test/app_worker.test.js', () => {
         .end();
     });
 
+    it('should FrameworkErrorformater work during app boot', () => {
+      app = utils.cluster('apps/app-start-framework-error', {
+        opt: {
+          env: Object.assign({}, process.env, {
+            EGG_APP_WORKER_LOGGER_LEVEL: 'INFO',
+          }),
+        },
+      });
+
+      return app
+        // .debug()
+        .expect('code', 1)
+        .expect('stderr', /CustomError: mock error \[https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99\]/)
+        .end();
+    });
+
+    it('should FrameworkErrorformater work during app boot ready', () => {
+      app = utils.cluster('apps/app-start-framework-ready-error', {
+        opt: {
+          env: Object.assign({}, process.env, {
+            EGG_APP_WORKER_LOGGER_LEVEL: 'INFO',
+          }),
+        },
+      });
+
+      return app
+        // .debug()
+        .expect('code', 1)
+        .expect('stderr', /CustomError: mock error \[https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99\]/)
+        .end();
+    });
+
     it('should remove error listener after ready', function* () {
       app = utils.cluster('apps/app-error-listeners');
       yield app.ready();

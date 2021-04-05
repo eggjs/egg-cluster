@@ -56,6 +56,7 @@
     "coffee": "^5.2.1",
     "egg": "^2.20.0",
     "egg-bin": "^4.11.1",
+    "egg-errors": "^2.2.0",
     "egg-mock": "^3.22.1",
     "eslint": "^5.15.1",
     "eslint-config-egg": "^7.2.0",
@@ -66,9 +67,9 @@
     "typescript": "^2.7.2"
   },
   "engines": {
-    "node": ">= 6.0.0"
+    "node": ">= 8.0.0"
   },
   "ci": {
-    "version": "6, 8, 10, 12"
+    "version": "8, 10, 12, 14"
   }
 }

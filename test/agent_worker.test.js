@@ -109,6 +109,24 @@ describe('test/agent_worker.test.js', () => {
         .end();
     });
 
+    it('should FrameworkErrorformater work during agent boot', () => {
+      app = utils.cluster('apps/agent-start-framework-error');
+      return app
+        // .debug()
+        .expect('code', 1)
+        .expect('stderr', /CustomError: mock error \[https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99\]/)
+        .end();
+    });
+
+    it('should FrameworkErrorformater work during agent boot ready', () => {
+      app = utils.cluster('apps/agent-start-framework-ready-error');
+      return app
+        // .debug()
+        .expect('code', 1)
+        .expect('stderr', /CustomError: mock error \[https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99\]/)
+        .end();
+    });
+
     // process.send is not exist if started by spawn
     it('master should not die if spawn error', function* () {
       app = coffee.spawn('node', [ utils.getFilepath('apps/agent-die/start.js') ]);

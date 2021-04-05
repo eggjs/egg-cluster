@@ -16,7 +16,7 @@ co(function* () {
       // node v8 process.channel
       const channel = app.proc._channel || app.proc.channel;
       console.error(channel);
-      channel.close();
+      channel.close && channel.close();
     });
   });
 
