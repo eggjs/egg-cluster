@@ -334,9 +334,9 @@ describe('test/master.test.js', () => {
         .expect('code', 0)
         .end();
 
-      yield sleep(3000);
-      app.proc.kill('SIGTERM');
       yield sleep(5000);
+      app.proc.kill('SIGTERM');
+      yield sleep(8000);
       assert(app.proc.killed === true);
       app.expect('stdout', /worker1 \[\d+\] started/);
       app.expect('stdout', /worker2 \[\d+\] started/);
