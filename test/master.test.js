@@ -106,6 +106,8 @@ describe('test/master.test.js', () => {
       yield sleep(6000);
       assert(app.proc.killed === true);
       app.expect('stdout', /INFO \d+ \[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /DEBUG \d+ \[master\] close done, exiting with code:0/);
       app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
       // app.expect('stdout', /INFO \d+ \[app_worker\] receive signal SIGTERM, exiting with code:0/);
@@ -191,6 +193,8 @@ describe('test/master.test.js', () => {
       yield sleep(6000);
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
@@ -209,6 +213,8 @@ describe('test/master.test.js', () => {
 
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGQUIT, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
@@ -228,6 +234,8 @@ describe('test/master.test.js', () => {
 
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] receive signal SIGINT, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
@@ -301,6 +309,8 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /worker2 \[\d+\] started/);
 
       app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
       app.expect('stdout', /worker1 on sigterm and exit/);
       app.expect('stdout', /worker2 on sigterm and exit/);
@@ -332,6 +342,8 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /worker2 \[\d+\] started/);
 
       app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
       app.expect('stdout', /worker1 on sigterm and not exit/);
       app.expect('stdout', /worker2 on sigterm and exit/);
