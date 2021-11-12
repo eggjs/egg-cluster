@@ -95,7 +95,7 @@ describe('test/master.test.js', () => {
         .expect('code', 0)
         .end();
 
-      // 2017-05-27 21:24:38,064 INFO 59065 [master] receive signal SIGTERM, closing
+      // 2017-05-27 21:24:38,064 INFO 59065 [master] master is killed by signal SIGTERM, closing
       // 2017-05-27 21:24:38,065 INFO 59065 [master] close done, exiting with code:0
       // 2017-05-27 21:24:38,065 INFO 59065 [master] exit with code:0
       // 2017-05-27 21:24:38,067 INFO 59067 [app_worker] receive signal SIGTERM, exiting with code:0
@@ -105,7 +105,9 @@ describe('test/master.test.js', () => {
       app.proc.kill('SIGTERM');
       yield sleep(6000);
       assert(app.proc.killed === true);
-      app.expect('stdout', /INFO \d+ \[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /INFO \d+ \[master\] master is killed by signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /DEBUG \d+ \[master\] close done, exiting with code:0/);
       app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
       // app.expect('stdout', /INFO \d+ \[app_worker\] receive signal SIGTERM, exiting with code:0/);
@@ -135,7 +137,7 @@ describe('test/master.test.js', () => {
 
       yield sleep(6000);
       assert(app.proc.killed === true);
-      app.notExpect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.notExpect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
       app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
       app.notExpect('stdout', /\[master\] exit with code:0/);
       app.expect('stderr', /\[app_worker\] receive disconnect event /);
@@ -161,7 +163,7 @@ describe('test/master.test.js', () => {
 
       yield sleep(6000);
       assert(app.proc.killed === true);
-      app.notExpect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.notExpect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
       app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
       app.notExpect('stdout', /\[master\] exit with code:0/);
       app.expect('stderr', /\[app_worker\] receive disconnect event /);
@@ -180,7 +182,7 @@ describe('test/master.test.js', () => {
         .end();
 
       // 2017-05-28 00:14:32,982 INFO 59714 [master] egg started on http://127.0.0.1:17001 (1606ms)
-      // 2017-05-28 00:14:32,987 INFO 59714 [master] receive signal SIGTERM, closing
+      // 2017-05-28 00:14:32,987 INFO 59714 [master] master is killed by signal SIGTERM, closing
       // 2017-05-28 00:14:32,988 INFO 59714 [master] close done, exiting with code:0
       // 2017-05-28 00:14:32,988 INFO 59714 [master] exit with code:0
       // 2017-05-28 00:14:32,996 INFO 59716 [app_worker] receive signal SIGTERM, exiting with code:0
@@ -190,7 +192,9 @@ describe('test/master.test.js', () => {
       app.proc.kill('SIGTERM');
       yield sleep(6000);
       assert(app.proc.killed === true);
-      app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
@@ -208,7 +212,9 @@ describe('test/master.test.js', () => {
       yield sleep(6000);
 
       assert(app.proc.killed === true);
-      app.expect('stdout', /\[master\] receive signal SIGQUIT, closing/);
+      app.expect('stdout', /\[master\] master is killed by signal SIGQUIT, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
@@ -227,7 +233,9 @@ describe('test/master.test.js', () => {
       yield sleep(6000);
 
       assert(app.proc.killed === true);
-      app.expect('stdout', /\[master\] receive signal SIGINT, closing/);
+      app.expect('stdout', /\[master\] master is killed by signal SIGINT, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
@@ -300,7 +308,9 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /worker1 \[\d+\] started/);
       app.expect('stdout', /worker2 \[\d+\] started/);
 
-      app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
       app.expect('stdout', /worker1 on sigterm and exit/);
       app.expect('stdout', /worker2 on sigterm and exit/);
@@ -324,14 +334,16 @@ describe('test/master.test.js', () => {
         .expect('code', 0)
         .end();
 
-      yield sleep(3000);
-      app.proc.kill('SIGTERM');
       yield sleep(5000);
+      app.proc.kill('SIGTERM');
+      yield sleep(8000);
       assert(app.proc.killed === true);
       app.expect('stdout', /worker1 \[\d+\] started/);
       app.expect('stdout', /worker2 \[\d+\] started/);
 
-      app.expect('stdout', /\[master\] receive signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
+      app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
+      app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /\[master\] exit with code:0/);
       app.expect('stdout', /worker1 on sigterm and not exit/);
       app.expect('stdout', /worker2 on sigterm and exit/);
@@ -486,7 +498,7 @@ describe('test/master.test.js', () => {
       p.on('message', msg => {
         masterPid = msg;
       });
-      yield sleep(5000);
+      yield sleep(10000);
       process.kill(masterPid);
       process.kill(p.pid);
       fs.closeSync(errFd);
