@@ -1,4 +1,10 @@
 
+1.27.1 / 2021-11-15
+==================
+
+**others**
+  * [[`98688f0`](http://github.com/eggjs/egg-cluster/commit/98688f04d9d6536a37dacf9f68ff44b1fbffbd35)] - chore: log more info before master closing (hyj1991 <<yeekwanvong@gmail.com>>)
+
 1.27.0 / 2021-04-05
 ==================
 
