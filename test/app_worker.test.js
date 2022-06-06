@@ -63,7 +63,7 @@ describe('test/app_worker.test.js', () => {
       return app
         // .debug()
         .expect('code', 1)
-        .expect('stderr', /CustomError: mock error \[https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99\]/)
+        .expect('stderr', /CustomError: mock error \[ https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99 \]/)
         .end();
     });
 
@@ -79,7 +79,7 @@ describe('test/app_worker.test.js', () => {
       return app
         // .debug()
         .expect('code', 1)
-        .expect('stderr', /CustomError: mock error \[https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99\]/)
+        .expect('stderr', /CustomError: mock error \[ https\:\/\/eggjs\.org\/zh-cn\/faq\/customPlugin_99 \]/)
         .end();
     });
 

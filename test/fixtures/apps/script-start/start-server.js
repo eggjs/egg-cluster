@@ -1,13 +1,12 @@
 'use strict';
 
-const co = require('co');
 const sleep = require('mz-modules/sleep');
 const utils = require('../../../utils');
 
-co(function* () {
+(async function() {
   const app = utils.cluster('apps/agent-exit');
   app.debug();
-  yield app.end();
+  await app.end();
 
   app.proc.on('message', () => {
     process.send(app.proc.pid, () => {
@@ -20,5 +19,5 @@ co(function* () {
     });
   });
 
-  yield sleep(3000);
-});
+  await sleep(3000);
+})();
