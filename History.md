@@ -1,4 +1,10 @@
 
+2.0.0 / 2022-11-02
+==================
+
+**features**
+  * [[`04a1e85`](http://github.com/eggjs/egg-cluster/commit/04a1e8539c61e2fecc16591e290aea84dcabd740)] - feat: support worker_threads (#101) (hyj1991 <<yeekwanvong@gmail.com>>)
+
 1.27.1 / 2021-11-15
 ==================
 
