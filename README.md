@@ -61,6 +61,8 @@ startCluster(options, () => {
 | https        | `Object`  | start a https server, note: `key` / `cert` / `ca` should be full path to file |
 | require      | `Array\|String` | will inject into worker/agent process |
 | pidFile      | `String`  | will save master pid to this file |
+| startMode    | `String`  | default is 'process', use 'worker_threads' to start the app & agent worker by worker_threads |
+| ports        | `Array`   | startup port of each app worker, such as: [7001, 7002, 7003], only effects when the startMode is 'worker_threads' |
 
 ## Env
 
