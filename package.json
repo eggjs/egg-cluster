@@ -53,7 +53,7 @@
     "egg": "^3.9.0",
     "egg-bin": "^5.6.1",
     "egg-errors": "^2.2.0",
-    "egg-mock": "^3.22.1",
+    "egg-mock": "^5.4.0",
     "eslint": "^8.26.0",
     "eslint-config-egg": "^12.1.0",
     "mz": "^2.7.0",
