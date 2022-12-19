@@ -11,7 +11,7 @@ const utils = require('./utils');
 
 describe('test/app_worker.test.js', () => {
   let app;
-  afterEach(() => app.close());
+  afterEach(() => app && app.close());
 
   describe('app worker', () => {
     before(() => {

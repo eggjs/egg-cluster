@@ -12,7 +12,7 @@ describe('test/https.test.js', () => {
   afterEach(mm.restore);
 
   describe('start https server with cluster options', () => {
-    afterEach(() => app.close());
+    afterEach(() => app && app.close());
 
     it('should success with status 200', function* () {
 
@@ -41,7 +41,7 @@ describe('test/https.test.js', () => {
   });
 
   describe('start https server with app config cluster', () => {
-    afterEach(() => app.close());
+    afterEach(() => app && app.close());
 
     it('should success with status 200', function* () {
       const baseDir = path.join(__dirname, 'fixtures/apps/https-server-config');

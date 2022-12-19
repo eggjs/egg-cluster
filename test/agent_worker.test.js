@@ -12,7 +12,7 @@ describe('test/agent_worker.test.js', () => {
   let app;
 
   describe('Fork Agent', () => {
-    afterEach(() => app.close());
+    afterEach(() => app && app.close());
 
     it('support config agent debug port', () => {
       mm(process.env, 'EGG_AGENT_DEBUG_PORT', '15800');

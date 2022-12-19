@@ -18,7 +18,7 @@ describe('test/master.test.js', () => {
   afterEach(mm.restore);
 
   describe('start master', () => {
-    afterEach(() => app.close());
+    afterEach(() => app && app.close());
 
     it('start success in local env', done => {
       mm.env('local');
