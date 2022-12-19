@@ -6,7 +6,7 @@ describe('worker_threads', () => {
   let app;
 
   describe('Fork Agent', () => {
-    afterEach(() => app.close());
+    afterEach(() => app && app.close());
 
     it('support config agent debug port', async () => {
       app = utils.cluster('apps/agent-worker-threads', { startMode: 'worker_threads' });
