@@ -1,11 +1,9 @@
-'use strict';
-
-const sleep = require('mz-modules/sleep');
+const { sleep } = require('../../../../lib/utils/timer');
 
 module.exports = app => {
-  app.beforeClose(function* () {
+  app.beforeClose(async () => {
     console.log('app closing');
-    yield sleep(10);
+    await sleep(10);
     console.log('app closed');
   });
 };

@@ -1,11 +1,9 @@
-'use strict';
-
 module.exports = app => {
-  app.get('/', function* () {
-    this.body = 'done';
+  app.get('/', ctx => {
+    ctx.body = 'done';
   });
 
-  app.get('/port', function* () {
-    this.body = this.app._options.port;
+  app.get('/port', ctx => {
+    ctx.body = ctx.app._options.port;
   });
 };

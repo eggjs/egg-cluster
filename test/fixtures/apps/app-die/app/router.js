@@ -1,10 +1,8 @@
-'use strict';
-
-module.exports = function(app) {
-  app.get('/exit', function* () {
+module.exports = app => {
+  app.get('/exit', ctx => {
     setTimeout(() => {
       throw new Error('exit');
     }, 10);
-    this.body = 'exit';
+    ctx.body = 'exit';
   });
 };

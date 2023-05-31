@@ -1,7 +1,5 @@
-'use strict';
-
 module.exports = app => {
-  app.get('/', function* () {
-    this.body = this.app.serverEmit;
+  app.get('/', ctx => {
+    ctx.body = ctx.app.serverEmit;
   });
 };

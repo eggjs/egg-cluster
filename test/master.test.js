@@ -1,16 +1,15 @@
-'use strict';
-
 const path = require('path');
-const mm = require('egg-mock');
 const assert = require('assert');
+const fs = require('fs');
+const { rm } = require('fs/promises');
+const cp = require('child_process');
 const pedding = require('pedding');
-const { mkdirp, rimraf, sleep } = require('mz-modules');
+const mm = require('egg-mock');
 const request = require('supertest');
 const semver = require('semver');
 const awaitEvent = require('await-event');
-const fs = require('mz/fs');
-const cp = require('child_process');
 const utils = require('./utils');
+const { sleep } = require('../lib/utils/timer');
 
 describe('test/master.test.js', () => {
   let app;
@@ -82,7 +81,7 @@ describe('test/master.test.js', () => {
   describe('close master', () => {
     afterEach(() => app.close());
 
-    it('master will close agent and app worker', function* () {
+    it('master will close agent and app worker', async () => {
       mm.env('local');
       mm(process.env, 'EGG_APP_WORKER_LOGGER_LEVEL', 'INFO');
       mm(process.env, 'EGG_AGENT_WORKER_LOGGER_LEVEL', 'INFO');
@@ -90,7 +89,7 @@ describe('test/master.test.js', () => {
       app = utils.cluster('apps/master-worker-started');
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
@@ -103,7 +102,7 @@ describe('test/master.test.js', () => {
       // 2017-05-27 21:24:38,106 INFO 59066 [agent_worker] receive signal SIGTERM, exiting with code:0
       // 2017-05-27 21:24:38,107 INFO 59066 [agent_worker] exit with code:0
       app.proc.kill('SIGTERM');
-      yield sleep(6000);
+      await sleep(6000);
       assert(app.proc.killed === true);
       app.expect('stdout', /INFO \d+ \[master\] master is killed by signal SIGTERM, closing/);
       app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
@@ -119,12 +118,12 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /INFO \d+ \[master\] wait 5000ms/);
     });
 
-    it('master kill by SIGKILL and agent, app worker exit too', function* () {
+    it('master kill by SIGKILL and agent, app worker exit too', async () => {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
@@ -135,7 +134,7 @@ describe('test/master.test.js', () => {
       // 2017-05-28 00:08:19,109 ERROR 59501 [agent_worker] exit with code:110
       app.proc.kill('SIGKILL');
 
-      yield sleep(6000);
+      await sleep(6000);
       assert(app.proc.killed === true);
       app.notExpect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
       app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
@@ -145,12 +144,12 @@ describe('test/master.test.js', () => {
       app.expect('stderr', /\[agent_worker\] exit with code:110/);
     });
 
-    it('master kill by SIGKILL and exit multi workers', function* () {
+    it('master kill by SIGKILL and exit multi workers', async () => {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started', { workers: 4 });
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
@@ -161,7 +160,7 @@ describe('test/master.test.js', () => {
       // 2017-05-28 00:08:19,109 ERROR 59501 [agent_worker] exit with code:110
       app.proc.kill('SIGKILL');
 
-      yield sleep(6000);
+      await sleep(6000);
       assert(app.proc.killed === true);
       app.notExpect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
       app.notExpect('stdout', /\[master\] close done, exiting with code:0/);
@@ -171,12 +170,12 @@ describe('test/master.test.js', () => {
       app.expect('stderr', /\[agent_worker\] exit with code:110/);
     });
 
-    it('use SIGTERM close master', function* () {
+    it('use SIGTERM close master', async () => {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
@@ -190,7 +189,7 @@ describe('test/master.test.js', () => {
       // 2017-05-28 00:14:33,047 INFO 59715 [agent_worker] receive signal SIGTERM, exiting with code:0
       // 2017-05-28 00:14:33,048 INFO 59715 [agent_worker] exit with code:0
       app.proc.kill('SIGTERM');
-      yield sleep(6000);
+      await sleep(6000);
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] master is killed by signal SIGTERM, closing/);
       app.expect('stdout', /\[master\] system memory: total \d+, free \d+/);
@@ -198,18 +197,18 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
-    it('use SIGQUIT close master', function* () {
+    it('use SIGQUIT close master', async () => {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
       app.proc.kill('SIGQUIT');
-      yield sleep(6000);
+      await sleep(6000);
 
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] master is killed by signal SIGQUIT, closing/);
@@ -218,19 +217,19 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
-    it('use SIGINT close master', function* () {
+    it('use SIGINT close master', async () => {
       mm.env('local');
       app = utils.cluster('apps/master-worker-started');
       // app.debug();
 
-      yield app
+      await app
         .expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
       app.proc.kill('SIGINT');
-      yield sleep(6000);
+      await sleep(6000);
 
       assert(app.proc.killed === true);
       app.expect('stdout', /\[master\] master is killed by signal SIGINT, closing/);
@@ -239,7 +238,7 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /\[master\] exit with code:0/);
     });
 
-    it('should close when set EGG_MASTER_CLOSE_TIMEOUT', function* () {
+    it('should close when set EGG_MASTER_CLOSE_TIMEOUT', async () => {
       mm.env('local');
       mm(process.env, 'EGG_APP_WORKER_LOGGER_LEVEL', 'INFO');
       mm(process.env, 'EGG_AGENT_WORKER_LOGGER_LEVEL', 'INFO');
@@ -248,19 +247,19 @@ describe('test/master.test.js', () => {
       app = utils.cluster('apps/master-worker-started');
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
       app.proc.kill('SIGTERM');
-      yield sleep(2000);
+      await sleep(2000);
       assert(app.proc.killed === true);
       app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
       app.expect('stdout', /INFO \d+ \[master\] wait 1000ms/);
     });
 
-    it('kill order', function* () {
+    it('kill order', async () => {
       mm.env('local');
       mm(process.env, 'EGG_APP_WORKER_LOGGER_LEVEL', 'INFO');
       mm(process.env, 'EGG_AGENT_WORKER_LOGGER_LEVEL', 'INFO');
@@ -269,13 +268,13 @@ describe('test/master.test.js', () => {
       mm(process.env, 'EGG_AGENT_CLOSE_TIMEOUT', 1000);
       app = utils.cluster('apps/worker-close-timeout');
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
       app.proc.kill('SIGTERM');
-      yield awaitEvent(app.proc, 'exit');
+      await awaitEvent(app.proc, 'exit');
 
       app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
       app.expect('stdout', /INFO \d+ \[master\] wait 1000ms/);
@@ -291,19 +290,19 @@ describe('test/master.test.js', () => {
       assert(!/agent worker never called after timeout/.test(app.stdout));
     });
 
-    it('close master will terminate all sub processes', function* () {
+    it('close master will terminate all sub processes', async () => {
       mm.env('local');
       app = utils.cluster('apps/sub-process');
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         // .debug()
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
-      yield sleep(3000);
+      await sleep(3000);
       app.proc.kill('SIGTERM');
-      yield sleep(5000);
+      await sleep(5000);
       assert(app.proc.killed === true);
       app.expect('stdout', /worker1 \[\d+\] started/);
       app.expect('stdout', /worker2 \[\d+\] started/);
@@ -324,19 +323,19 @@ describe('test/master.test.js', () => {
       assert(!alive(pid2));
     });
 
-    it('close master will terminate all sub processes with sigkill', function* () {
+    it('close master will terminate all sub processes with sigkill', async () => {
       mm.env('local');
       app = utils.cluster('apps/sub-process-sigkill');
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         // .debug()
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
-      yield sleep(5000);
+      await sleep(5000);
       app.proc.kill('SIGTERM');
-      yield sleep(8000);
+      await sleep(8000);
       assert(app.proc.killed === true);
       app.expect('stdout', /worker1 \[\d+\] started/);
       app.expect('stdout', /worker2 \[\d+\] started/);
@@ -363,46 +362,46 @@ describe('test/master.test.js', () => {
     const runDir = path.join(__dirname, './fixtures/apps/master-worker-started/run');
     const pidFile = path.join(runDir, './pid');
 
-    beforeEach(() => rimraf(runDir));
+    beforeEach(() => rm(runDir, { force: true, recursive: true }));
     afterEach(() => app.close());
 
-    it('master should write pid file and delete', function* () {
+    it('master should write pid file and delete', async () => {
       app = utils.cluster('apps/master-worker-started', { pidFile });
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
       assert(fs.existsSync(pidFile));
-      const pid = yield fs.readFile(pidFile, 'utf-8');
+      const pid = fs.readFileSync(pidFile, 'utf-8');
       assert(pid === String(app.process.pid));
 
       app.proc.kill('SIGTERM');
-      yield sleep(6000);
+      await sleep(6000);
       app.expect('stdout', /\[master\] exit with code:0/);
       assert(!fs.existsSync(pidFile));
     });
 
-    it('master should ignore fail when delete pid file ', function* () {
+    it('master should ignore fail when delete pid file ', async () => {
       app = utils.cluster('apps/master-worker-started', { pidFile });
       // app.debug();
 
-      yield app.expect('stdout', /egg start/)
+      await app.expect('stdout', /egg start/)
         .expect('stdout', /egg started/)
         .expect('code', 0)
         .end();
 
       assert(fs.existsSync(pidFile));
-      const pid = yield fs.readFile(pidFile, 'utf-8');
+      const pid = fs.readFileSync(pidFile, 'utf-8');
       assert(pid === String(app.process.pid));
 
       // delete
       fs.unlinkSync(pidFile);
 
       app.proc.kill('SIGTERM');
-      yield sleep(6000);
+      await sleep(6000);
       app.expect('stdout', /\[master\] exit with code:0/);
       assert(!fs.existsSync(pidFile));
     });
@@ -411,11 +410,11 @@ describe('test/master.test.js', () => {
   describe('Messenger', () => {
     afterEach(() => app.close());
 
-    it('parent -> app/agent', function* () {
+    it('parent -> app/agent', async () => {
       app = utils.cluster('apps/messenger');
       // app.debug();
 
-      yield app.end();
+      await app.end();
 
       app.proc.send({
         action: 'parent2app',
@@ -428,7 +427,7 @@ describe('test/master.test.js', () => {
         to: 'agent',
       });
 
-      yield sleep(1000);
+      await sleep(1000);
       app.expect('stdout', /parent -> agent/);
       app.expect('stdout', /parent -> app/);
     });
@@ -447,39 +446,39 @@ describe('test/master.test.js', () => {
       }, 1);
     });
 
-    it('should app <-> agent', function* () {
+    it('should app <-> agent', async () => {
       app = utils.cluster('apps/messenger');
       // app.debug();
-      yield app.end();
+      await app.end();
 
-      yield sleep(10000);
+      await sleep(10000);
       app.expect('stdout', /app -> agent/);
       app.expect('stdout', /agent -> app/);
       app.expect('stdout', /app: agent2appbystring/);
       app.expect('stdout', /agent: app2agentbystring/);
     });
 
-    it('should send multi app worker', function* () {
+    it('should send multi app worker', async () => {
       app = utils.cluster('apps/send-to-multiapp', { workers: 4 });
       // app.debug();
-      yield app.end();
-      yield sleep(1000);
+      await app.end();
+      await sleep(1000);
       app.expect('stdout', /\d+ '?got'?/);
     });
 
-    it('sendTo should work', function* () {
+    it('sendTo should work', async () => {
       app = utils.cluster('apps/messenger');
       // app.debug();
-      yield app.end();
+      await app.end();
       app.proc.on('message', console.log);
-      yield sleep(1000);
+      await sleep(1000);
       app.expect('stdout', /app sendTo agent done/);
       app.expect('stdout', /agent sendTo agent done/);
       app.expect('stdout', /app sendTo app done/);
       app.expect('stdout', /agent sendTo app done/);
     });
 
-    it('egg-script exit', function* () {
+    it('egg-script exit', async () => {
       app = {
         close: () => {},
       };
@@ -498,7 +497,7 @@ describe('test/master.test.js', () => {
       p.on('message', msg => {
         masterPid = msg;
       });
-      yield sleep(10000);
+      await sleep(10000);
       process.kill(masterPid);
       process.kill(p.pid);
       fs.closeSync(errFd);
@@ -559,12 +558,12 @@ describe('test/master.test.js', () => {
       return app.ready();
     });
 
-    it('should restart 4 workers', function* () {
+    it('should restart 4 workers', async () => {
       app.process.send({
         to: 'master',
         action: 'reload-worker',
       });
-      yield sleep(20000);
+      await sleep(20000);
       app.expect('stdout', /app_worker#4:\d+ disconnect/);
       app.expect('stdout', /app_worker#8:\d+ started/);
     });
@@ -589,30 +588,30 @@ describe('test/master.test.js', () => {
     });
     after(() => app.close());
 
-    it('app/agent should recieve egg-ready', function* () {
+    it('app/agent should recieve egg-ready', async () => {
       // work for message sent
-      yield sleep(5000);
+      await sleep(5000);
       assert(readyMsg.match(/parent: port=\d+, address=http:\/\/127.0.0.1:\d+/));
       app.expect('stdout', /agent receive egg-ready, with 1 workers/);
       app.expect('stdout', /app receive egg-ready, worker 1/);
     });
 
-    it('should recieve egg-ready when app restart', function* () {
-      yield request(app.callback())
+    it('should recieve egg-ready when app restart', async () => {
+      await request(app.callback())
         .get('/exception-app')
         .expect(200);
 
-      yield sleep(5000);
+      await sleep(5000);
 
       app.expect('stdout', /app receive egg-ready, worker 2/);
     });
 
-    it('should recieve egg-ready when agent restart', function* () {
-      yield request(app.callback())
+    it('should recieve egg-ready when agent restart', async () => {
+      await request(app.callback())
         .get('/exception-agent')
         .expect(200);
 
-      yield sleep(5000);
+      await sleep(5000);
 
       const matched = app.stdout.match(/agent receive egg-ready/g);
       assert(matched.length === 2);
@@ -629,36 +628,36 @@ describe('test/master.test.js', () => {
     });
     after(() => app.close());
 
-    it('should every app worker will get message', function* () {
-      yield sleep(1000);
+    it('should every app worker will get message', async () => {
+      await sleep(1000);
       // start two workers
       app.expect('stdout', /#1 agent get 1 workers \[ \d+ \]/);
       app.expect('stdout', /#2 agent get 2 workers \[ \d+, \d+ \]/);
     });
 
-    it('agent should get update message after app died', function* () {
+    it('agent should get update message after app died', async () => {
       try {
-        yield app.httpRequest()
+        await app.httpRequest()
           .get('/exit')
           .end();
       } catch (_) {
         // ignore
       }
 
-      yield sleep(9000);
+      await sleep(9000);
       // oh, one worker dead
       app.expect('stdout', /#3 agent get 1 workers \[ \d+ \]/);
       // never mind, fork new worker
       app.expect('stdout', /#4 agent get 2 workers \[ \d+, \d+ \]/);
     });
 
-    it('agent should get message when agent restart', function* () {
+    it('agent should get message when agent restart', async () => {
       app.process.send({
         to: 'agent',
         action: 'kill-agent',
       });
 
-      yield sleep(9000);
+      await sleep(9000);
       app.expect('stdout', /#1 agent get 2 workers \[ \d+, \d+ \]/);
     });
   });
@@ -674,13 +673,13 @@ describe('test/master.test.js', () => {
     });
     after(() => app.close());
 
-    it('agent start should get message', function* () {
+    it('agent start should get message', async () => {
       app.process.send({
         to: 'agent',
         action: 'kill-agent',
       });
 
-      yield sleep(9000);
+      await sleep(9000);
       app.expect('stdout', /#1 app get 0 workers \[\]/);
       app.expect('stdout', /#2 app get 1 workers \[ \d+ \]/);
     });
@@ -756,9 +755,9 @@ describe('test/master.test.js', () => {
         return app.ready();
       });
 
-      it('parent should recieve debug', function* () {
+      it('parent should recieve debug', async () => {
         // work for message sent
-        yield sleep(5000);
+        await sleep(5000);
         app.expect('stdout', /agent receive egg-ready, with 2 workers/);
         app.expect('stdout', /app receive egg-ready/);
         assert(result.agent.debugPort === 5800);
@@ -791,9 +790,9 @@ describe('test/master.test.js', () => {
         return app.ready();
       });
 
-      it('parent should recieve debug', function* () {
+      it('parent should recieve debug', async () => {
         // work for message sent
-        yield sleep(5000);
+        await sleep(5000);
         app.expect('stdout', /agent receive egg-ready, with 2 workers/);
         app.expect('stdout', /app receive egg-ready/);
         assert(result.agent.debugPort === 5800);
@@ -822,9 +821,9 @@ describe('test/master.test.js', () => {
         return app.ready();
       });
 
-      it('parent should not recieve debug', function* () {
+      it('parent should not recieve debug', async () => {
         // work for message sent
-        yield sleep(5000);
+        await sleep(5000);
         app.expect('stdout', /agent receive egg-ready, with 1 workers/);
         app.expect('stdout', /app receive egg-ready/);
         assert(!result);
@@ -852,9 +851,9 @@ describe('test/master.test.js', () => {
         return app.ready();
       });
 
-      it('should not log err', function* () {
+      it('should not log err', async () => {
         // work for message sent
-        yield sleep(6000);
+        await sleep(6000);
         app.expect('stderr', /\[master] app_worker#.*signal: SIGKILL/);
         app.expect('stderr', /\[master] worker kill by debugger, exiting/);
         app.expect('stdout', /\[master] exit with code:0/);
@@ -882,49 +881,49 @@ describe('test/master.test.js', () => {
   });
 
   describe('agent and worker exception', () => {
-    it('should not exit when local env', function* () {
+    it('should not exit when local env', async () => {
       mm.env('local');
       app = utils.cluster('apps/check-status');
       // app.debug();
-      yield app.ready();
-      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
+      await app.ready();
+      fs.writeFileSync(path.join(app.baseDir, 'logs/started'), '');
 
-      yield sleep(30000);
+      await sleep(30000);
 
       // process should exist
       assert(app.process.exitCode === null);
       app.process.kill('SIGINT');
     });
 
-    it('should exit when no agent after check 3 times', function* () {
+    it('should exit when no agent after check 3 times', async () => {
       mm.env('prod');
       app = utils.cluster('apps/check-status');
       // app.debug();
-      yield app.ready();
-      mkdirp.sync(path.join(app.baseDir, 'logs'));
-      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
+      await app.ready();
+      fs.mkdirSync(path.join(app.baseDir, 'logs'), { recursive: true });
+      fs.writeFileSync(path.join(app.baseDir, 'logs/started'), '');
 
       // kill agent worker and will exit when start
       app.process.send({ to: 'agent', action: 'kill' });
 
-      yield awaitEvent(app.proc, 'exit');
+      await awaitEvent(app.proc, 'exit');
 
       assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 0 agent and 1 worker(s) alive, exit to avoid unknown state'));
       assert(app.stderr.includes('[master] exit with code:1'));
     });
 
-    it('should exit when no app after check 3 times', function* () {
+    it('should exit when no app after check 3 times', async () => {
       mm.env('prod');
       app = utils.cluster('apps/check-status');
       // app.debug();
-      yield app.ready();
-      mkdirp.sync(path.join(app.baseDir, 'logs'));
-      yield fs.writeFile(path.join(app.baseDir, 'logs/started'), '');
+      await app.ready();
+      fs.mkdirSync(path.join(app.baseDir, 'logs'), { recursive: true });
+      fs.writeFileSync(path.join(app.baseDir, 'logs/started'), '');
 
       // kill app worker and wait checking
       app.process.send({ to: 'app', action: 'kill' });
 
-      yield awaitEvent(app.proc, 'exit');
+      await awaitEvent(app.proc, 'exit');
 
       assert(app.stderr.includes('nodejs.ClusterWorkerExceptionError: [master] 1 agent and 0 worker(s) alive, exit to avoid unknown state'));
       assert(app.stderr.includes('[master] exit with code:1'));
@@ -932,14 +931,14 @@ describe('test/master.test.js', () => {
   });
 
   describe('beforeClose', () => {
-    it('should wait app close', function* () {
+    it('should wait app close', async () => {
       mm.env('local');
       app = utils.cluster('apps/before-close');
       // app.debug();
-      yield app.ready();
+      await app.ready();
 
-      yield app.close();
-      yield sleep(5000);
+      await app.close();
+      await sleep(5000);
 
       app.expect('stdout', /app closing/);
       app.expect('stdout', /app closed/);

@@ -1,7 +1,5 @@
-'use strict';
-
-module.exports = function(app) {
-  app.get('/exit', function* () {
+module.exports = app => {
+  app.get('/exit', () => {
     process.exit(1);
   });
 };
