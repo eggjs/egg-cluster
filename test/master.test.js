@@ -638,8 +638,7 @@ describe('test/master.test.js', () => {
     it('agent should get update message after app died', async () => {
       try {
         await app.httpRequest()
-          .get('/exit')
-          .end();
+          .get('/exit');
       } catch (_) {
         // ignore
       }
