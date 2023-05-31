@@ -1,6 +1,7 @@
 # egg-cluster
 
 [![NPM version][npm-image]][npm-url]
+[![CI](https://github.com/eggjs/egg-cluster/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eggjs/egg-cluster/actions/workflows/nodejs.yml)
 [![Test coverage][codecov-image]][codecov-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
@@ -14,14 +15,14 @@
 [download-image]: https://img.shields.io/npm/dm/egg-cluster.svg?style=flat-square
 [download-url]: https://npmjs.org/package/egg-cluster
 
-Cluster Manager for Egg
+Cluster Manager for EggJS
 
 ---
 
 ## Install
 
 ```bash
-$ npm i egg-cluster --save
+npm i egg-cluster --save
 ```
 
 ## Usage
@@ -57,6 +58,7 @@ startCluster(options, () => {
 | pidFile      | `String`  | will save master pid to this file |
 | startMode    | `String`  | default is 'process', use 'worker_threads' to start the app & agent worker by worker_threads |
 | ports        | `Array`   | startup port of each app worker, such as: [7001, 7002, 7003], only effects when the startMode is 'worker_threads' |
+| env        | `String`   | custom env, default is process.env.EGG_SERVER_ENV |
 
 ## Env
 

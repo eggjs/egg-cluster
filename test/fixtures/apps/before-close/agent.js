@@ -1,11 +1,9 @@
-'use strict';
-
-const sleep = require('mz-modules/sleep');
+const { sleep } = require('../../../../lib/utils/timer');
 
 module.exports = agent => {
-  agent.beforeClose(function* () {
+  agent.beforeClose(async () => {
     console.log('agent closing');
-    yield sleep(10);
+    await sleep(10);
     console.log('agent closed');
   });
 };

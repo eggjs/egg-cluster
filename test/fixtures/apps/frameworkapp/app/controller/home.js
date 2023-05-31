@@ -1,9 +1,7 @@
-'use strict';
-
-module.exports = function* () {
-  this.body = {
-    frameworkCore: !!this.app.framework,
-    frameworkPlugin: !!this.app.custom,
-    frameworkAgent: !!this.app.agent,
+module.exports = async ctx => {
+  ctx.body = {
+    frameworkCore: !!ctx.app.framework,
+    frameworkPlugin: !!ctx.app.custom,
+    frameworkAgent: !!ctx.app.agent,
   };
 };

@@ -1,8 +1,6 @@
-'use strict';
-
-module.exports = function(app) {
-  app.get('/', function* () {
-    this.body = {
+module.exports = app => {
+  app.get('/', ctx => {
+    ctx.body = {
       beforeReady: app.beforeReady,
       afterReady: app.listeners('error').length,
     };

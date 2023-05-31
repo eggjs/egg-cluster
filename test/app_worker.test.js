@@ -1,13 +1,11 @@
-'use strict';
-
+const assert = require('assert');
+const { rm } = require('fs/promises');
 const mm = require('egg-mock');
-const sleep = require('mz-modules/sleep');
-const rimraf = require('mz-modules/rimraf');
 const request = require('supertest');
 const urllib = require('urllib');
 const address = require('address');
-const assert = require('assert');
 const utils = require('./utils');
+const { sleep } = require('../lib/utils/timer');
 
 describe('test/app_worker.test.js', () => {
   let app;
@@ -83,16 +81,16 @@ describe('test/app_worker.test.js', () => {
         .end();
     });
 
-    it('should remove error listener after ready', function* () {
+    it('should remove error listener after ready', async () => {
       app = utils.cluster('apps/app-error-listeners');
-      yield app.ready();
-      yield app.httpRequest()
+      await app.ready();
+      await app.httpRequest()
         .get('/')
         .expect({
           beforeReady: 1,
           afterReady: 1,
         });
-      yield app.close();
+      await app.close();
     });
 
     it('should ignore listen to other port', done => {
@@ -111,13 +109,13 @@ describe('test/app_worker.test.js', () => {
     });
     after(mm.restore);
 
-    it('should restart', function* () {
-      yield app.httpRequest()
+    it('should restart', async () => {
+      await app.httpRequest()
         .get('/exit')
         .expect(200);
 
       // wait app worker restart
-      yield sleep(10000);
+      await sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stdout', /app_worker#2:\d+ started/);
@@ -133,16 +131,16 @@ describe('test/app_worker.test.js', () => {
     });
     after(mm.restore);
 
-    it('should restart', function* () {
+    it('should restart', async () => {
       try {
-        yield app.httpRequest()
+        await app.httpRequest()
           .get('/exit');
       } catch (_) {
         // ignore
       }
 
       // wait app worker restart
-      yield sleep(10000);
+      await sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stderr', /don't fork new work/);
@@ -158,16 +156,16 @@ describe('test/app_worker.test.js', () => {
     });
     after(mm.restore);
 
-    it('should exit', function* () {
+    it('should exit', async () => {
       try {
-        yield app.httpRequest()
+        await app.httpRequest()
           .get('/kill?signal=SIGKILL');
       } catch (_) {
         // ignore
       }
 
       // wait app worker restart
-      yield sleep(10000);
+      await sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stderr', /don't fork new work/);
@@ -194,63 +192,63 @@ describe('test/app_worker.test.js', () => {
       mm.env('default');
     });
     afterEach(mm.restore);
-    afterEach(() => rimraf(sockFile));
+    afterEach(() => rm(sockFile, { force: true, recursive: true }));
 
-    it('should error then port is not specified', function* () {
+    it('should error then port is not specified', async () => {
       app = utils.cluster('apps/app-listen-without-port');
       // app.debug();
-      yield app.ready();
+      await app.ready();
 
       app.expect('code', 1);
       app.expect('stderr', /port should be number, but got null/);
     });
 
-    it('should use port in config', function* () {
+    it('should use port in config', async () => {
       app = utils.cluster('apps/app-listen-port');
       // app.debug();
-      yield app.ready();
+      await app.ready();
 
       app.expect('code', 0);
       app.expect('stdout', /egg started on http:\/\/127.0.0.1:17010/);
 
-      yield request('http://0.0.0.0:17010')
+      await request('http://0.0.0.0:17010')
         .get('/')
         .expect('done')
         .expect(200);
 
-      yield request('http://127.0.0.1:17010')
+      await request('http://127.0.0.1:17010')
         .get('/')
         .expect('done')
         .expect(200);
 
-      yield request('http://localhost:17010')
+      await request('http://localhost:17010')
         .get('/')
         .expect('done')
         .expect(200);
 
-      yield request('http://127.0.0.1:17010')
+      await request('http://127.0.0.1:17010')
         .get('/port')
         .expect('17010')
         .expect(200);
     });
 
-    it('should use hostname in config', function* () {
+    it('should use hostname in config', async () => {
       const url = address.ip() + ':17010';
 
       app = utils.cluster('apps/app-listen-hostname');
       // app.debug();
-      yield app.ready();
+      await app.ready();
 
       app.expect('code', 0);
       app.expect('stdout', new RegExp(`egg started on http://${url}`));
 
-      yield request(url)
+      await request(url)
         .get('/')
         .expect('done')
         .expect(200);
 
       try {
-        const response = yield urllib.request('http://127.0.0.1:17010', { dataType: 'text' });
+        const response = await urllib.request('http://127.0.0.1:17010', { dataType: 'text' });
         assert(response.status === 200);
         assert(response.data === 'done');
         throw new Error('should not run');
@@ -259,40 +257,40 @@ describe('test/app_worker.test.js', () => {
       }
     });
 
-    it('should use path in config', function* () {
+    it('should use path in config', async () => {
       app = utils.cluster('apps/app-listen-path');
       // app.debug();
-      yield app.ready();
+      await app.ready();
 
       app.expect('code', 0);
       app.expect('stdout', new RegExp(`egg started on ${sockFile}`));
 
       const sock = encodeURIComponent(sockFile);
-      yield request(`http+unix://${sock}`)
+      await request(`http+unix://${sock}`)
         .get('/')
         .expect('done')
         .expect(200);
     });
   });
 
-  it('should exit when EADDRINUSE', function* () {
+  it('should exit when EADDRINUSE', async () => {
     mm.env('default');
 
     app = utils.cluster('apps/app-server', { port: 17001 });
     // app.debug();
-    yield app.ready();
+    await app.ready();
 
     let app2;
     try {
       app2 = utils.cluster('apps/app-server', { port: 17001 });
       app2.debug();
-      yield app2.ready();
+      await app2.ready();
 
       app2.expect('code', 1);
       app2.expect('stderr', /\[app_worker] server got error: bind EADDRINUSE null:17001, code: EADDRINUSE/);
       app2.expect('stdout', /don't fork/);
     } finally {
-      yield app2.close();
+      await app2.close();
     }
   });
 
@@ -301,35 +299,35 @@ describe('test/app_worker.test.js', () => {
       mm.env('default');
     });
 
-    it('should refork when app_worker exit', function* () {
+    it('should refork when app_worker exit', async () => {
       app = utils.cluster('apps/app-die');
       // app.debug();
-      yield app.ready();
+      await app.ready();
 
-      yield app.httpRequest()
+      await app.httpRequest()
         .get('/exit')
         .expect(200);
 
-      yield sleep(10000);
+      await sleep(10000);
 
       app.expect('stdout', /app_worker#1:\d+ started at \d+/);
       app.expect('stderr', /new worker:\d+ fork/);
       app.expect('stdout', /app_worker#1:\d+ disconnect/);
       app.expect('stdout', /app_worker#2:\d+ started at \d+/);
 
-      yield app.httpRequest()
+      await app.httpRequest()
         .get('/exit')
         .expect(200);
 
-      yield sleep(10000);
+      await sleep(10000);
 
       app.expect('stdout', /app_worker#3:\d+ started at \d+/);
     });
 
-    it('should not refork when starting', function* () {
+    it('should not refork when starting', async () => {
       app = utils.cluster('apps/app-start-error');
       // app.debug();
-      yield app.ready();
+      await app.ready();
 
       app.expect('stdout', /don't fork/);
       app.expect('stderr', /app_worker#1:\d+ start fail/);

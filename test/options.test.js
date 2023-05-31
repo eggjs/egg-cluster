@@ -1,7 +1,5 @@
-'use strict';
-
 const path = require('path');
-const assert = require('assert');
+const { strict: assert } = require('assert');
 const os = require('os');
 const mm = require('egg-mock');
 const parseOptions = require('../lib/utils/options');
@@ -94,6 +92,24 @@ describe('test/options.test.js', () => {
       mm(process, 'execArgv', [ '--debug=5858' ]);
       const options = parseOptions({});
       assert(options.isDebug === true);
+    });
+  });
+
+  describe('env', () => {
+    it('default env is null', () => {
+      const options = parseOptions({});
+      assert.equal(options.env, null);
+    });
+
+    it('custom env = prod', () => {
+      const options = parseOptions({ env: 'prod' });
+      assert.equal(options.env, 'prod');
+    });
+
+    it('default env set to process.env.EGG_SERVER_ENV', () => {
+      mm(process.env, 'EGG_SERVER_ENV', 'prod');
+      const options = parseOptions({});
+      assert.equal(options.env, 'prod');
     });
   });
 

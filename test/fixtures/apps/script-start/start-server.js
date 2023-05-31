@@ -1,9 +1,7 @@
-'use strict';
-
-const sleep = require('mz-modules/sleep');
+const { sleep } = require('../../../../lib/utils/timer');
 const utils = require('../../../utils');
 
-(async function() {
+(async () => {
   const app = utils.cluster('apps/agent-exit');
   app.debug();
   await app.end();

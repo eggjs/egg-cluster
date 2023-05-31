@@ -1,11 +1,9 @@
-'use strict';
-
 const assert = require('assert');
 const path = require('path');
 const coffee = require('coffee');
 const mm = require('egg-mock');
-const fs = require('mz/fs');
-const sleep = require('mz-modules/sleep');
+const { readFile } = require('fs/promises');
+const { sleep } = require('../lib/utils/timer');
 const utils = require('./utils');
 
 describe('test/agent_worker.test.js', () => {
@@ -49,9 +47,9 @@ describe('test/agent_worker.test.js', () => {
         .end();
     });
 
-    it('should refork new agent_worker after app started', function* () {
+    it('should refork new agent_worker after app started', async () => {
       app = utils.cluster('apps/agent-die');
-      yield app
+      await app
         // .debug()
         .expect('stdout', /\[master\] egg started on http:\/\/127.0.0.1:\d+/)
         .end();
@@ -61,7 +59,7 @@ describe('test/agent_worker.test.js', () => {
         action: 'kill-agent',
       });
 
-      yield sleep(20000);
+      await sleep(20000);
 
       app.expect('stderr', /\[master\] agent_worker#1:\d+ died/);
       app.expect('stdout', /\[master\] try to start a new agent_worker after 1s .../);
@@ -69,16 +67,16 @@ describe('test/agent_worker.test.js', () => {
       app.notExpect('stdout', /app_worker#2/);
     });
 
-    it('should exit agent_worker when master die in accident', function* () {
+    it('should exit agent_worker when master die in accident', async () => {
       app = utils.cluster('apps/agent-die');
-      yield app
+      await app
         // .debug()
         .expect('stdout', /\[master\] egg started on http:\/\/127.0.0.1:\d+/)
         .end();
 
       // kill -9 master
       app.process.kill('SIGKILL');
-      yield sleep(5000);
+      await sleep(5000);
       app.expect('stderr', /\[app_worker\] receive disconnect event in cluster fork mode, exitedAfterDisconnect:false/)
         .expect('stderr', /\[agent_worker\] receive disconnect event on child_process fork mode, exiting with code:110/)
         .expect('stderr', /\[agent_worker\] exit with code:110/);
@@ -128,12 +126,12 @@ describe('test/agent_worker.test.js', () => {
     });
 
     // process.send is not exist if started by spawn
-    it('master should not die if spawn error', function* () {
+    it('master should not die if spawn error', async () => {
       app = coffee.spawn('node', [ utils.getFilepath('apps/agent-die/start.js') ]);
       // app.debug();
       app.close = () => app.proc.kill();
 
-      yield sleep(3000);
+      await sleep(3000);
       app.emit('close', 0);
       app.expect('stderr', /Error: Cannot find module/);
       app.notExpect('stderr', /TypeError: process.send is not a function/);
@@ -147,9 +145,9 @@ describe('test/agent_worker.test.js', () => {
     });
     after(() => app.close());
 
-    it('should support custom logger in agent', function* () {
-      yield sleep(1500);
-      const content = yield fs.readFile(
+    it('should support custom logger in agent', async () => {
+      await sleep(1500);
+      const content = await readFile(
         path.join(__dirname, 'fixtures/apps/custom-logger/logs/monitor.log'), 'utf8');
       assert(content === 'hello monitor!\n');
     });

@@ -1,5 +1,3 @@
-'use strict';
-
-exports.index = function* () {
-  this.body = 'hi cluster';
+exports.index = ctx => {
+  ctx.body = 'hi cluster';
 };

@@ -1,9 +1,7 @@
-'use strict';
-
 const assert = require('assert');
+const path = require('path');
 const mm = require('egg-mock');
 const urllib = require('urllib');
-const path = require('path');
 const utils = require('./utils');
 
 describe('test/https.test.js', () => {
@@ -14,7 +12,7 @@ describe('test/https.test.js', () => {
   describe('start https server with cluster options', () => {
     afterEach(() => app && app.close());
 
-    it('should success with status 200', function* () {
+    it('should success with status 200', async () => {
 
       const baseDir = path.join(__dirname, 'fixtures/apps/https-server');
       const options = {
@@ -27,9 +25,9 @@ describe('test/https.test.js', () => {
         },
       };
       app = utils.cluster('apps/https-server', options);
-      yield app.ready();
+      await app.ready();
 
-      const response = yield urllib.request('https://127.0.0.1:8443', {
+      const response = await urllib.request('https://127.0.0.1:8443', {
         dataType: 'text',
         rejectUnauthorized: false,
       });
@@ -43,7 +41,7 @@ describe('test/https.test.js', () => {
   describe('start https server with app config cluster', () => {
     afterEach(() => app && app.close());
 
-    it('should success with status 200', function* () {
+    it('should success with status 200', async () => {
       const baseDir = path.join(__dirname, 'fixtures/apps/https-server-config');
       const options = {
         baseDir,
@@ -51,9 +49,9 @@ describe('test/https.test.js', () => {
       };
 
       app = utils.cluster('apps/https-server-config', options);
-      yield app.ready();
+      await app.ready();
 
-      const response = yield urllib.request('https://127.0.0.1:8443', {
+      const response = await urllib.request('https://127.0.0.1:8443', {
         dataType: 'text',
         rejectUnauthorized: false,
       });
