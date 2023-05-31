@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/eggjs/egg-cluster/compare/v2.0.1...v2.1.0) (2023-05-31)
+
+
+### Features
+
+* custom env by options.env ([#107](https://github.com/eggjs/egg-cluster/issues/107)) ([4b11bf9](https://github.com/eggjs/egg-cluster/commit/4b11bf9e7117f5bd5e69985d8185cfa509256ae4))
+
 ## [2.0.1](https://github.com/eggjs/egg-cluster/compare/v2.0.0...v2.0.1) (2022-12-19)
 
 
