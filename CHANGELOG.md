@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/eggjs/egg-cluster/compare/v2.1.0...v2.1.1) (2023-06-06)
+
+
+### Bug Fixes
+
+* worker_threads start auto add port when server.address() return null ([#108](https://github.com/eggjs/egg-cluster/issues/108)) ([62d6d0b](https://github.com/eggjs/egg-cluster/commit/62d6d0bada98c5976481b0bd366afabc8245c6ff))
+
 ## [2.1.0](https://github.com/eggjs/egg-cluster/compare/v2.0.1...v2.1.0) (2023-05-31)
 
 
