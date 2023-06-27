@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/eggjs/egg-cluster/compare/v2.1.1...v2.2.0) (2023-06-27)
+
+
+### Features
+
+* add debugPort to allow listen both https and http protocol ([#109](https://github.com/eggjs/egg-cluster/issues/109)) ([74cbb35](https://github.com/eggjs/egg-cluster/commit/74cbb35a8890cdf069f2a98aab288d9804419c70))
+
 ## [2.1.1](https://github.com/eggjs/egg-cluster/compare/v2.1.0...v2.1.1) (2023-06-06)
 
 
