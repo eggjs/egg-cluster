@@ -53,6 +53,7 @@ startCluster(options, () => {
 | workers      | `Number`  | numbers of app workers                   |
 | sticky       | `Boolean` | sticky mode server                       |
 | port         | `Number`  | port                                     |
+| debugPort    | `Number`  | the debug port only listen on http protocol |
 | https        | `Object`  | start a https server, note: `key` / `cert` / `ca` should be full path to file |
 | require      | `Array\|String` | will inject into worker/agent process |
 | pidFile      | `String`  | will save master pid to this file |
