@@ -43,6 +43,7 @@
     "ps-tree": "^1.2.0",
     "semver": "^5.6.0",
     "sendmessage": "^1.1.0",
+    "terminal-link": "^2.1.1",
     "utility": "^1.15.0"
   },
   "devDependencies": {
@@ -57,7 +58,8 @@
     "pedding": "^1.1.0",
     "supertest": "^4.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "urllib": "^3.17.1"
   },
   "engines": {
     "node": ">= 14.0.0"
