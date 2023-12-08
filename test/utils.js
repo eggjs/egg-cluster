@@ -9,6 +9,10 @@ exports.cluster = function(name, options) {
     customEgg: path.join(__dirname, './fixtures/egg'),
     eggPath: path.dirname(require.resolve('egg')),
     cache: false,
+    opt: {
+      // clear execArgv from egg-bin
+      execArgv: [],
+    },
   }, options);
   return mm.cluster(options);
 };
