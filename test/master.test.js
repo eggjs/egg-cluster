@@ -109,10 +109,10 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /\[master\] process info: heap_limit \d+, heap_used \d+/);
       app.expect('stdout', /DEBUG \d+ \[master\] close done, exiting with code:0/);
       app.expect('stdout', /INFO \d+ \[master\] exit with code:0/);
-      // app.expect('stdout', /INFO \d+ \[app_worker\] receive signal SIGTERM, exiting with code:0/);
-      // app.expect('stdout', /INFO \d+ \[agent_worker\] receive signal SIGTERM, exiting with code:0/);
-      // app.notExpect('stderr', /\[app_worker\] receive disconnect event in cluster fork mode/);
-      // app.notExpect('stderr', /\[agent_worker\] receive disconnect event /);
+      app.expect('stdout', /INFO \d+ \[app_worker\] receive signal SIGTERM, exiting with code:0/);
+      app.expect('stdout', /INFO \d+ \[agent_worker\] receive signal SIGTERM, exiting with code:0/);
+      app.notExpect('stderr', /\[app_worker\] receive disconnect event in cluster fork mode/);
+      app.notExpect('stderr', /\[agent_worker\] receive disconnect event /);
       app.expect('stdout', /INFO \d+ \[app_worker\] exit with code:0/);
       app.expect('stdout', /INFO \d+ \[agent_worker\] exit with code:0/);
       app.expect('stdout', /INFO \d+ \[master\] wait 5000ms/);
