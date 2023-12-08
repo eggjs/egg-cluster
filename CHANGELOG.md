@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/eggjs/egg-cluster/compare/v2.2.0...v2.2.1) (2023-12-08)
+
+
+### Bug Fixes
+
+* worker does not get SIGTERM signal from master when close ([#111](https://github.com/eggjs/egg-cluster/issues/111)) ([211c143](https://github.com/eggjs/egg-cluster/commit/211c143c7a679c0049573742dd9e3691188857eb))
+
 ## [2.2.0](https://github.com/eggjs/egg-cluster/compare/v2.1.1...v2.2.0) (2023-06-27)
 
 
