@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/eggjs/egg-cluster/compare/v2.2.1...v2.3.0) (2024-06-03)
+
+
+### Features
+
+* remove semver and depd ([#113](https://github.com/eggjs/egg-cluster/issues/113)) ([789a1cd](https://github.com/eggjs/egg-cluster/commit/789a1cd3f1f058fa0112e491f5c2259534cc7bbb))
+
 ## [2.2.1](https://github.com/eggjs/egg-cluster/compare/v2.2.0...v2.2.1) (2023-12-08)
 
 
