@@ -6,7 +6,6 @@ const cp = require('child_process');
 const pedding = require('pedding');
 const mm = require('egg-mock');
 const request = require('supertest');
-const semver = require('semver');
 const awaitEvent = require('await-event');
 const utils = require('./utils');
 const { sleep } = require('../lib/utils/timer');
@@ -688,9 +687,8 @@ describe('test/master.test.js', () => {
     let app;
     afterEach(() => app.close());
 
-    // 6.x: Debugger listening on [::]:5858
-    // 8.x: Debugger listening on ws://127.0.0.1:9229/221caad4-e2d0-4630-b0bb-f7fb27b81ff6
-    const debugProtocol = semver.gte(process.version, '8.0.0') ? 'inspect' : 'debug';
+    // Debugger listening on ws://127.0.0.1:9229/221caad4-e2d0-4630-b0bb-f7fb27b81ff6
+    const debugProtocol = 'inspect';
 
     it('should debug', () => {
       app = utils.cluster('apps/debug-port', { workers: 2, opt: { execArgv: [ `--${debugProtocol}` ] } });
