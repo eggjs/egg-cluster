@@ -8,7 +8,7 @@
     "test": "npm run lint -- --fix && npm run test-local",
     "test-local": "egg-bin test --ts false",
     "cov": "egg-bin cov --prerequire --timeout 100000 --ts false",
-    "ci": "npm run lint && npm run cov",
+    "ci": "npm run lint && node test/reuseport_cluster.js && npm run cov",
     "contributor": "git-contributor"
   },
   "files": [
