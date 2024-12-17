@@ -51,7 +51,7 @@ export class AppThreadWorker extends BaseAppWorker<ThreadWorker> {
   }
 
   static send(message: MessageBody) {
-    message.senderWorkerId = threadId;
+    message.senderWorkerId = String(threadId);
     parentPort!.postMessage(message);
   }
 

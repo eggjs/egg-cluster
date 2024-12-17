@@ -16,7 +16,7 @@ export class AgentProcessWorker extends BaseAgentWorker<ChildProcess> {
   }
 
   static send(message: MessageBody) {
-    message.senderWorkerId = process.pid;
+    message.senderWorkerId = String(process.pid);
     process.send!(message);
   }
 

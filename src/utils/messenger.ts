@@ -12,9 +12,12 @@ export interface MessageBody {
   data?: unknown;
   to?: MessageCharacter;
   from?: MessageCharacter;
+  /**
+   * @deprecated Keep compatible, please use receiverWorkerId instead
+   */
   receiverPid?: string;
-  // receiverWorkerId?: number;
-  senderWorkerId?: number;
+  receiverWorkerId?: string;
+  senderWorkerId?: string;
 }
 
 /**
@@ -93,11 +96,12 @@ export class Messenger {
     }
 
     // https://github.com/eggjs/egg/blob/b6861f1c7548f05a281386050dfeaeb30f236558/lib/core/messenger/ipc.js#L56
-    // recognize receiverPid is to who
-    if (data.receiverPid) {
-      if (data.receiverPid === String(process.pid)) {
+    // recognize receiverWorkerId is to who
+    const receiverWorkerId = data.receiverWorkerId ?? data.receiverPid;
+    if (receiverWorkerId) {
+      if (receiverWorkerId === String(process.pid)) {
         data.to = 'master';
-      } else if (data.receiverPid === String(this.#workerManager.getAgent()!.workerId)) {
+      } else if (receiverWorkerId === String(this.#workerManager.getAgent()!.workerId)) {
         data.to = 'agent';
       } else {
         data.to = 'app';
@@ -180,8 +184,9 @@ export class Messenger {
       if (worker.state === 'disconnected') {
         continue;
       }
-      // check receiverPid
-      if (data.receiverPid && data.receiverPid !== String(worker.workerId)) {
+      // check receiverWorkerId
+      const receiverWorkerId = data.receiverWorkerId ?? data.receiverPid;
+      if (receiverWorkerId && receiverWorkerId !== String(worker.workerId)) {
         continue;
       }
       worker.send(data);

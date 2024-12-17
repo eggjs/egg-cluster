@@ -36,7 +36,7 @@ export class AppProcessWorker extends BaseAppWorker<ClusterProcessWorker> {
   }
 
   static send(message: MessageBody) {
-    message.senderWorkerId = process.pid;
+    message.senderWorkerId = String(process.pid);
     process.send!(message);
   }
 
