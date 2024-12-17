@@ -1,24 +1,18 @@
-'use strict';
+import cluster, { type Worker as ClusterProcessWorker } from 'node:cluster';
+import { cfork } from 'cfork';
+import { sendmessage } from 'sendmessage';
+import { graceful as gracefulExit, type Options as gracefulExitOptions } from 'graceful-process';
+import { BaseAppWorker, BaseAppUtils } from '../../base/app.js';
+import { terminate } from '../../../terminate.js';
+import type { MessageBody } from '../../../messenger.js';
 
-const cluster = require('cluster');
-const cfork = require('cfork');
-const sendmessage = require('sendmessage');
-const gracefulExit = require('graceful-process');
-
-const { BaseAppWorker, BaseAppUtils } = require('../../base/app');
-const terminate = require('../../../terminate');
-
-class AppWorker extends BaseAppWorker {
+export class AppProcessWorker extends BaseAppWorker<ClusterProcessWorker> {
   get id() {
     return this.instance.id;
   }
 
   get workerId() {
-    return this.instance.process.pid;
-  }
-
-  get state() {
-    return this.instance.state;
+    return this.instance.process.pid!;
   }
 
   get exitedAfterDisconnect() {
@@ -26,23 +20,23 @@ class AppWorker extends BaseAppWorker {
   }
 
   get exitCode() {
-    return this.instance.exitCode;
+    return this.instance.process.exitCode!;
   }
 
-  send(...args) {
-    sendmessage(this.instance, ...args);
+  send(message: MessageBody) {
+    sendmessage(this.instance, message);
   }
 
   clean() {
     this.instance.removeAllListeners();
   }
 
-  static on(event, callback) {
-    process.on(event, callback);
+  static on(event: string, listener: (...args: any[]) => void) {
+    process.on(event, listener);
   }
 
-  static send(data) {
-    process.send(data);
+  static send(message: MessageBody) {
+    process.send!(message);
   }
 
   static kill() {
@@ -50,12 +44,12 @@ class AppWorker extends BaseAppWorker {
     process.kill(process.pid);
   }
 
-  static gracefulExit(options) {
+  static gracefulExit(options: gracefulExitOptions) {
     gracefulExit(options);
   }
 }
 
-class AppUtils extends BaseAppUtils {
+export class AppProcessUtils extends BaseAppUtils {
   fork() {
     this.startTime = Date.now();
     this.startSuccessCount = 0;
@@ -74,7 +68,7 @@ class AppUtils extends BaseAppUtils {
 
     let debugPort = process.debugPort;
     cluster.on('fork', worker => {
-      const appWorker = new AppWorker(worker);
+      const appWorker = new AppProcessWorker(worker);
       this.emit('worker_forked', appWorker);
       appWorker.disableRefork = true;
       worker.on('message', msg => {
@@ -88,9 +82,10 @@ class AppUtils extends BaseAppUtils {
         this.messenger.send(msg);
       });
       this.log('[master] app_worker#%s:%s start, state: %s, current workers: %j',
-        appWorker.id, appWorker.workerId, appWorker.state, Object.keys(cluster.workers));
+        appWorker.id, appWorker.workerId, appWorker.state,
+        Object.keys(cluster.workers!));
 
-      // send debug message, due to `brk` scence, send here instead of app_worker.js
+      // send debug message, due to `brk` scene, send here instead of app_worker.js
       if (this.options.isDebug) {
         debugPort++;
         this.messenger.send({
@@ -99,18 +94,21 @@ class AppUtils extends BaseAppUtils {
           action: 'debug',
           data: {
             debugPort,
+            // keep compatibility, should use workerId instead
             pid: appWorker.workerId,
+            workerId: appWorker.workerId,
           },
         });
       }
     });
     cluster.on('disconnect', worker => {
-      const appWorker = new AppWorker(worker);
+      const appWorker = new AppProcessWorker(worker);
       this.logger.info('[master] app_worker#%s:%s disconnect, suicide: %s, state: %s, current workers: %j',
-        appWorker.id, appWorker.workerId, appWorker.exitedAfterDisconnect, appWorker.state, Object.keys(cluster.workers));
+        appWorker.id, appWorker.workerId, appWorker.exitedAfterDisconnect, appWorker.state,
+        Object.keys(cluster.workers!));
     });
     cluster.on('exit', (worker, code, signal) => {
-      const appWorker = new AppWorker(worker);
+      const appWorker = new AppProcessWorker(worker);
       this.messenger.send({
         action: 'app-exit',
         data: {
@@ -123,7 +121,7 @@ class AppUtils extends BaseAppUtils {
       });
     });
     cluster.on('listening', (worker, address) => {
-      const appWorker = new AppWorker(worker);
+      const appWorker = new AppProcessWorker(worker);
       this.messenger.send({
         action: 'app-start',
         data: {
@@ -138,13 +136,11 @@ class AppUtils extends BaseAppUtils {
     return this;
   }
 
-  async kill(timeout) {
-    await Promise.all(Object.keys(cluster.workers).map(id => {
-      const worker = cluster.workers[id];
-      worker.disableRefork = true;
-      return terminate(worker, timeout);
+  async kill(timeout: number) {
+    await Promise.all(Object.keys(cluster.workers!).map(id => {
+      const worker = cluster.workers![id]!;
+      Reflect.set(worker, 'disableRefork', true);
+      return terminate(worker.process, timeout);
     }));
   }
 }
-
-module.exports = { AppWorker, AppUtils };

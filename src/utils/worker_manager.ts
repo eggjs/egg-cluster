@@ -1,13 +1,17 @@
-'use strict';
-
-const EventEmitter = require('events');
+import { EventEmitter } from 'node:events';
+import { BaseAgentWorker } from './mode/base/agent.js';
+import { BaseAppWorker } from './mode/base/app.js';
 
 // worker manager to record agent and worker forked by egg-cluster
 // can do some check stuff here to monitor the healthy
-class Manager extends EventEmitter {
+export class WorkerManager extends EventEmitter {
+  agent: BaseAgentWorker | null;
+  workers = new Map<number, BaseAppWorker>();
+  exception = 0;
+  timer: NodeJS.Timeout;
+
   constructor() {
     super();
-    this.workers = new Map();
     this.agent = null;
   }
 
@@ -15,7 +19,7 @@ class Manager extends EventEmitter {
     return Array.from(this.workers.keys());
   }
 
-  setAgent(agent) {
+  setAgent(agent: BaseAgentWorker) {
     this.agent = agent;
   }
 
@@ -27,15 +31,15 @@ class Manager extends EventEmitter {
     this.agent = null;
   }
 
-  setWorker(worker) {
+  setWorker(worker: BaseAppWorker) {
     this.workers.set(worker.workerId, worker);
   }
 
-  getWorker(workerId) {
+  getWorker(workerId: number) {
     return this.workers.get(workerId);
   }
 
-  deleteWorker(workerId) {
+  deleteWorker(workerId: number) {
     this.workers.delete(workerId);
   }
 
@@ -43,10 +47,14 @@ class Manager extends EventEmitter {
     return Array.from(this.workers.keys());
   }
 
+  listWorkers() {
+    return Array.from(this.workers.values());
+  }
+
   getListeningWorkerIds() {
     const keys = [];
-    for (const id of this.workers.keys()) {
-      if (this.getWorker(id).state === 'listening') {
+    for (const [ id, worker ] of this.workers.entries()) {
+      if (worker.state === 'listening') {
         keys.push(id);
       }
     }
@@ -55,7 +63,7 @@ class Manager extends EventEmitter {
 
   count() {
     return {
-      agent: (this.agent && this.agent.status === 'started') ? 1 : 0,
+      agent: this.agent?.status === 'started' ? 1 : 0,
       worker: this.listWorkerIds().length,
     };
   }
@@ -63,10 +71,9 @@ class Manager extends EventEmitter {
   // check agent and worker must both alive
   // if exception appear 3 times, emit an exception event
   startCheck() {
-    this.exception = 0;
     this.timer = setInterval(() => {
       const count = this.count();
-      if (count.agent && count.worker) {
+      if (count.agent > 0 && count.worker > 0) {
         this.exception = 0;
         return;
       }
@@ -78,5 +85,3 @@ class Manager extends EventEmitter {
     }, 10000);
   }
 }
-
-module.exports = Manager;
