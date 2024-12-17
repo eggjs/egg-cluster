@@ -128,7 +128,7 @@ describe('test/options.test.ts', () => {
     });
   });
 
-  describe.only('options', () => {
+  describe('options', () => {
     let app: any;
     before(() => {
       app = cluster('apps/options', {
