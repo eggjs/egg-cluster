@@ -14,6 +14,7 @@ export class AgentThreadWorker extends BaseAgentWorker<Worker> {
   }
 
   static send(message: MessageBody) {
+    message.senderWorkerId = workerThreads.threadId;
     workerThreads.parentPort!.postMessage(message);
   }
 

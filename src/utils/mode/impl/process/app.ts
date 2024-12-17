@@ -36,6 +36,7 @@ export class AppProcessWorker extends BaseAppWorker<ClusterProcessWorker> {
   }
 
   static send(message: MessageBody) {
+    message.senderWorkerId = process.pid;
     process.send!(message);
   }
 
@@ -103,7 +104,7 @@ export class AppProcessUtils extends BaseAppUtils {
     });
     cluster.on('disconnect', worker => {
       const appWorker = new AppProcessWorker(worker);
-      this.logger.info('[master] app_worker#%s:%s disconnect, suicide: %s, state: %s, current workers: %j',
+      this.log('[master] app_worker#%s:%s disconnect, suicide: %s, state: %s, current workers: %j',
         appWorker.id, appWorker.workerId, appWorker.exitedAfterDisconnect, appWorker.state,
         Object.keys(cluster.workers!));
     });
@@ -122,6 +123,8 @@ export class AppProcessUtils extends BaseAppUtils {
     });
     cluster.on('listening', (worker, address) => {
       const appWorker = new AppProcessWorker(worker);
+      appWorker.state = 'listening';
+      this.log('[master] app_worker#%s:%s listening at %j', appWorker.id, appWorker.workerId, address);
       this.messenger.send({
         action: 'app-start',
         data: {

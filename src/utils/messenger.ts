@@ -13,6 +13,8 @@ export interface MessageBody {
   to?: MessageCharacter;
   from?: MessageCharacter;
   receiverPid?: string;
+  // receiverWorkerId?: number;
+  senderWorkerId?: number;
 }
 
 /**

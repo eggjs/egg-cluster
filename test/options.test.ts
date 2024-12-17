@@ -133,8 +133,7 @@ describe('test/options.test.ts', () => {
     before(() => {
       app = cluster('apps/options', {
         foo: true,
-        framework: path.dirname(importResolve('egg')),
-      } as any);
+      } as any).debug();
       return app.ready();
     });
     after(() => app.close());

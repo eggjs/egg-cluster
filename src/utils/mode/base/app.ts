@@ -9,8 +9,6 @@ import { getSrcDirname } from '../../../dirname.js';
 
 export abstract class BaseAppWorker<T = ThreadWorker | ClusterProcessWorker> {
   instance: T;
-  #isDevReload: boolean;
-  #state: string;
 
   constructor(instance: T) {
     this.instance = instance;
@@ -20,12 +18,12 @@ export abstract class BaseAppWorker<T = ThreadWorker | ClusterProcessWorker> {
 
   abstract get id(): number;
 
-  get state() {
-    return this.#state;
+  get state(): string {
+    return Reflect.get(this.instance!, 'state') as string;
   }
 
-  set state(state) {
-    this.#state = state;
+  set state(state: string) {
+    Reflect.set(this.instance!, 'state', state);
   }
 
   abstract get exitedAfterDisconnect(): boolean;
@@ -40,12 +38,12 @@ export abstract class BaseAppWorker<T = ThreadWorker | ClusterProcessWorker> {
     Reflect.set(this.instance!, 'disableRefork', disableRefork);
   }
 
-  get isDevReload() {
-    return this.#isDevReload;
+  get isDevReload(): boolean {
+    return Reflect.get(this.instance!, 'isDevReload') as boolean;
   }
 
-  set isDevReload(status) {
-    this.#isDevReload = status;
+  set isDevReload(isDevReload: boolean) {
+    Reflect.set(this.instance!, 'isDevReload', isDevReload);
   }
 
   abstract send(data: MessageBody): void;

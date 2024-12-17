@@ -387,7 +387,8 @@ export class Master extends ReadyEventEmitter {
       to: 'app',
     });
     this.logger.info('[master] agent_worker#%s:%s started (%sms)',
-      this.agentWorker.instance.id, this.agentWorker.instance.workerId, Date.now() - this.agentWorker.startTime);
+      this.agentWorker.instance.id, this.agentWorker.instance.workerId,
+      Date.now() - this.agentWorker.startTime);
   }
 
   /**

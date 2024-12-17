@@ -143,8 +143,10 @@ async function main() {
           return;
         }
         const args = [ port ];
-        if (listenConfig.hostname) args.push(listenConfig.hostname);
-        debug('listen options %s', args);
+        if (listenConfig.hostname) {
+          args.push(listenConfig.hostname);
+        }
+        debug('listen options %j', args);
         server.listen(...args);
       }
       if (debugPortServer) {

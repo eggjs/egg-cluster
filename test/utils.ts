@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 export function cluster(baseDir: string, options: ClusterOptions) {
   return mm.cluster({
     baseDir,
-    customEgg: path.join(__dirname, 'fixtures/egg'),
+    framework: path.join(__dirname, 'fixtures/egg'),
     // eggPath: path.join(__dirname, '../node_modules/egg'),
     cache: false,
     opt: {
