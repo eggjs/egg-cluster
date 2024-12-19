@@ -1,70 +1,76 @@
-'use strict';
+import os from 'node:os';
+import v8 from 'node:v8';
+import util from 'node:util';
+import path from 'node:path';
+import fs from 'node:fs';
+import net from 'node:net';
+import { ReadyEventEmitter } from 'get-ready';
+import { detectPort } from 'detect-port';
+import { reload } from 'cluster-reload';
+import { EggConsoleLogger as ConsoleLogger } from 'egg-logger';
+import { readJSONSync } from 'utility';
+import terminalLink from 'terminal-link';
+import { parseOptions, ClusterOptions, ParsedClusterOptions } from './utils/options.js';
+import { WorkerManager } from './utils/worker_manager.js';
+import { Messenger } from './utils/messenger.js';
+import {
+  AgentProcessWorker, AgentProcessUtils as ProcessAgentWorker,
+} from './utils/mode/impl/process/agent.js';
+import { AppProcessWorker, AppProcessUtils as ProcessAppWorker } from './utils/mode/impl/process/app.js';
+import {
+  AgentThreadWorker, AgentThreadUtils as WorkerThreadsAgentWorker,
+} from './utils/mode/impl/worker_threads/agent.js';
+import { AppThreadWorker, AppThreadUtils as WorkerThreadsAppWorker } from './utils/mode/impl/worker_threads/app.js';
+import { ClusterWorkerExceptionError } from './error/ClusterWorkerExceptionError.js';
 
-const os = require('os');
-const v8 = require('v8');
-const util = require('util');
-const path = require('path');
-const fs = require('fs');
-const EventEmitter = require('events');
-const ready = require('get-ready');
-const { detectPort } = require('detect-port');
-const ConsoleLogger = require('egg-logger').EggConsoleLogger;
-const utility = require('utility');
-const terminalLink = require('terminal-link');
+export interface MasterOptions extends ParsedClusterOptions {
+  clusterPort?: number;
+  stickyWorkerPort?: number;
+}
 
-const Manager = require('./utils/manager');
-const parseOptions = require('./utils/options');
-const Messenger = require('./utils/messenger');
-const { AgentUtils: ProcessAgentWorker } = require('./utils/mode/impl/process/agent');
-const { AppUtils: ProcessAppWorker } = require('./utils/mode/impl/process/app');
-const { AgentUtils: WorkerThreadsAgentWorker } = require('./utils/mode/impl/worker_threads/agent');
-const { AppUtils: WorkerThreadsAppWorker } = require('./utils/mode/impl/worker_threads/app');
+export class Master extends ReadyEventEmitter {
+  options: MasterOptions;
+  isStarted = false;
+  workerManager: WorkerManager;
+  messenger: Messenger;
+  isProduction: boolean;
+  agentWorkerIndex = 0;
+  closed = false;
+  logger: ConsoleLogger;
+  agentWorker: ProcessAgentWorker | WorkerThreadsAgentWorker;
+  appWorker: ProcessAppWorker | WorkerThreadsAppWorker;
+  #logMethod: 'info' | 'debug';
+  #realPort?: number;
+  #protocol: string;
+  #appAddress: string;
 
-const PROTOCOL = Symbol('Master#protocol');
-const REAL_PORT = Symbol('Master#real_port');
-const APP_ADDRESS = Symbol('Master#appAddress');
-
-class Master extends EventEmitter {
-
-  /**
-   * @class
-   * @param {Object} options
-   *  - {String} [framework] - specify framework that can be absolute path or npm package
-   *  - {String} [baseDir] directory of application, default to `process.cwd()`
-   *  - {Object} [plugins] - customized plugins, for unittest
-   *  - {Number} [workers] numbers of app workers, default to `os.cpus().length`
-   *  - {Number} [port] listening port, default to 7001(http) or 8443(https)
-   *  - {Number} [debugPort] listening a debug port on http protocol
-   *  - {Object} [https] https options, { key, cert, ca }, full path
-   *  - {Array|String} [require] will inject into worker/agent process
-   *  - {String} [pidFile] will save master pid to this file
-   *  - {String} [env] custom env, default is process.env.EGG_SERVER_ENV
-   */
-  constructor(options) {
+  constructor(options?: ClusterOptions) {
     super();
-    this.options = parseOptions(options);
-    this.workerManager = new Manager();
+    this.#start(options)
+      .catch(err => {
+        this.ready(err);
+      });
+  }
+
+  async #start(options?: ClusterOptions) {
+    this.options = await parseOptions(options);
+    this.workerManager = new WorkerManager();
     this.messenger = new Messenger(this, this.workerManager);
-
-    ready.mixin(this);
-
     this.isProduction = isProduction(this.options);
-    this.agentWorkerIndex = 0;
-    this.closed = false;
-    this[REAL_PORT] = this.options.port;
-    this[PROTOCOL] = this.options.https ? 'https' : 'http';
+    this.#realPort = this.options.port;
+    this.#protocol = this.options.https ? 'https' : 'http';
 
     // app started or not
     this.isStarted = false;
-    this.logger = new ConsoleLogger({ level: process.env.EGG_MASTER_LOGGER_LEVEL || 'INFO' });
-    this.logMethod = 'info';
+    this.logger = new ConsoleLogger({ level: process.env.EGG_MASTER_LOGGER_LEVEL ?? 'INFO' });
+    this.#logMethod = 'info';
     if (this.options.env === 'local' || process.env.NODE_ENV === 'development') {
-      this.logMethod = 'debug';
+      this.#logMethod = 'debug';
     }
 
     // get the real framework info
     const frameworkPath = this.options.framework;
-    const frameworkPkg = utility.readJSONSync(path.join(frameworkPath, 'package.json'));
+    const frameworkPkg = readJSONSync(path.join(frameworkPath, 'package.json'));
 
     // set app & agent worker impl
     if (this.options.startMode === 'worker_threads') {
@@ -76,7 +82,9 @@ class Master extends EventEmitter {
     this.log(`[master] =================== ${frameworkPkg.name} start =====================`);
     this.logger.info(`[master] node version ${process.version}`);
     /* istanbul ignore next */
-    if (process.alinode) this.logger.info(`[master] alinode version ${process.alinode}`);
+    if ('alinode' in process) {
+      this.logger.info(`[master] alinode version ${process.alinode}`);
+    }
     this.logger.info(`[master] ${frameworkPkg.name} version ${frameworkPkg.version}`);
 
     if (this.isProduction) {
@@ -93,13 +101,16 @@ class Master extends EventEmitter {
     this.ready(() => {
       this.isStarted = true;
       const stickyMsg = this.options.sticky ? ' with STICKY MODE!' : '';
-      const startedURL = terminalLink(this[APP_ADDRESS], this[APP_ADDRESS], { fallback: false });
+      const startedURL = terminalLink(this.#appAddress, this.#appAddress, { fallback: false });
       this.logger.info('[master] %s started on %s (%sms)%s',
         frameworkPkg.name, startedURL, Date.now() - startTime, stickyMsg);
       if (this.options.debugPort) {
-        const url = getAddress({ port: this.options.debugPort, protocol: 'http' });
+        const url = getAddress({
+          port: this.options.debugPort,
+          protocol: 'http',
+        });
         const debugPortURL = terminalLink(url, url, { fallback: false });
-        this.logger.info('[master] %s started on %s', frameworkPkg.name, debugPortURL);
+        this.logger.info('[master] %s started debug port on %s', frameworkPkg.name, debugPortURL);
       }
 
       const action = 'egg-ready';
@@ -107,10 +118,10 @@ class Master extends EventEmitter {
         action,
         to: 'parent',
         data: {
-          port: this[REAL_PORT],
+          port: this.#realPort,
           debugPort: this.options.debugPort,
-          address: this[APP_ADDRESS],
-          protocol: this[PROTOCOL],
+          address: this.#appAddress,
+          protocol: this.#protocol,
         },
       });
       this.messenger.send({
@@ -142,8 +153,12 @@ class Master extends EventEmitter {
     // get the real port from options and app.config
     // app worker will send after loading
     this.on('realport', ({ port, protocol }) => {
-      if (port) this[REAL_PORT] = port;
-      if (protocol) this[PROTOCOL] = protocol;
+      if (port) {
+        this.#realPort = port;
+      }
+      if (protocol) {
+        this.#protocol = protocol;
+      }
     });
 
     // https://nodejs.org/api/process.html#process_signal_events
@@ -169,16 +184,11 @@ class Master extends EventEmitter {
       });
 
     // exit when agent or worker exception
-    this.workerManager.on('exception', ({
-      agent,
-      worker,
+    this.workerManager.on('exception', (count: {
+      agent: number;
+      worker: number;
     }) => {
-      const err = new Error(`[master] ${agent} agent and ${worker} worker(s) alive, exit to avoid unknown state`);
-      err.name = 'ClusterWorkerExceptionError';
-      err.count = {
-        agent,
-        worker,
-      };
+      const err = new ClusterWorkerExceptionError(count.agent, count.worker);
       this.logger.error(err);
       process.exit(1);
     });
@@ -214,35 +224,29 @@ class Master extends EventEmitter {
     });
   }
 
-  detectPorts() {
+  async detectPorts() {
     // Detect cluster client port
-    return detectPort()
-      .then(port => {
-        this.options.clusterPort = port;
-        // If sticky mode, detect worker port
-        if (this.options.sticky) {
-          return detectPort();
-        }
-      })
-      .then(port => {
-        if (this.options.sticky) {
-          this.options.stickyWorkerPort = port;
-        }
-      })
-      .catch(/* istanbul ignore next */ err => {
-        this.logger.error(err);
-        process.exit(1);
-      });
+    try {
+      const clusterPort = await detectPort();
+      this.options.clusterPort = clusterPort;
+      // If sticky mode, detect worker port
+      if (this.options.sticky) {
+        const stickyWorkerPort = await detectPort();
+        this.options.stickyWorkerPort = stickyWorkerPort;
+      }
+    } catch (err) {
+      this.logger.error(err);
+      process.exit(1);
+    }
   }
 
-
-  log(...args) {
-    this.logger[this.logMethod](...args);
+  log(msg: string, ...args: any[]) {
+    this.logger[this.#logMethod](msg, ...args);
   }
 
-  startMasterSocketServer(cb) {
+  startMasterSocketServer(cb: (err?: Error) => void) {
     // Create the outside facing server listening on our port.
-    require('net').createServer({
+    net.createServer({
       pauseOnConnect: true,
     }, connection => {
       // We received a connection and need to pass it to the appropriate
@@ -256,34 +260,37 @@ class Master extends EventEmitter {
         // Read https://en.wikipedia.org/wiki/TCP_reset_attack for more details.
         connection.destroy();
       } else {
-        const worker = this.stickyWorker(connection.remoteAddress);
+        const worker = this.stickyWorker(connection.remoteAddress) as AppProcessWorker;
         worker.instance.send('sticky-session:connection', connection);
       }
-    }).listen(this[REAL_PORT], cb);
+    }).listen(this.#realPort, cb);
   }
 
-  stickyWorker(ip) {
+  stickyWorker(ip: string) {
     const workerNumbers = this.options.workers;
     const ws = this.workerManager.listWorkerIds();
 
     let s = '';
     for (let i = 0; i < ip.length; i++) {
-      if (!isNaN(ip[i])) {
+      if (!isNaN(parseInt(ip[i]))) {
         s += ip[i];
       }
     }
-    s = Number(s);
-    const pid = ws[s % workerNumbers];
-    return this.workerManager.getWorker(pid);
+    const pid = ws[Number(s) % workerNumbers];
+    return this.workerManager.getWorker(pid)!;
   }
 
   forkAgentWorker() {
-    this.agentWorker.on('agent_forked', agent => this.workerManager.setAgent(agent));
+    this.agentWorker.on('agent_forked', (agent: AgentProcessWorker | AgentThreadWorker) => {
+      this.workerManager.setAgent(agent);
+    });
     this.agentWorker.fork();
   }
 
   forkAppWorkers() {
-    this.appWorker.on('worker_forked', worker => this.workerManager.setWorker(worker));
+    this.appWorker.on('worker_forked', (worker: AppProcessWorker | AppThreadWorker) => {
+      this.workerManager.setWorker(worker);
+    });
     this.appWorker.fork();
   }
 
@@ -296,22 +303,24 @@ class Master extends EventEmitter {
    * @param {number} timeout - kill agent timeout
    * @return {Promise} -
    */
-  async killAgentWorker(timeout) {
+  async killAgentWorker(timeout: number) {
     await this.agentWorker.kill(timeout);
   }
 
-  async killAppWorkers(timeout) {
+  async killAppWorkers(timeout: number) {
     await this.appWorker.kill(timeout);
   }
 
   /**
    * Agent Worker exit handler
    * Will exit during startup, and refork during running.
-   * @param {Object} data
-   *  - {Number} code - exit code
-   *  - {String} signal - received signal
    */
-  onAgentExit(data) {
+  onAgentExit(data: {
+    /** exit code */
+    code: number;
+    /** received signal */
+    signal: string;
+  }) {
     if (this.closed) return;
 
     this.messenger.send({
@@ -320,7 +329,7 @@ class Master extends EventEmitter {
       data: [],
     });
     const agentWorker = this.agentWorker;
-    this.workerManager.deleteAgent(agentWorker);
+    this.workerManager.deleteAgent();
 
     const err = new Error(util.format('[master] agent_worker#%s:%s died (code: %s, signal: %s)',
       agentWorker.instance.id, agentWorker.instance.workerId, data.code, data.signal));
@@ -378,28 +387,28 @@ class Master extends EventEmitter {
       to: 'app',
     });
     this.logger.info('[master] agent_worker#%s:%s started (%sms)',
-      this.agentWorker.instance.id, this.agentWorker.instance.workerId, Date.now() - this.agentWorker.startTime);
+      this.agentWorker.instance.id, this.agentWorker.instance.workerId,
+      Date.now() - this.agentWorker.startTime);
   }
 
   /**
    * App Worker exit handler
-   * @param {Object} data
-   *  - {String} workerId - worker id
-   *  - {Number} code - exit code
-   *  - {String} signal - received signal
    */
-  onAppExit(data) {
+  onAppExit(data: {
+    workerId: number;
+    code: number;
+    signal: string;
+  }) {
     if (this.closed) return;
 
-    const worker = this.workerManager.getWorker(data.workerId);
-
+    const worker = this.workerManager.getWorker(data.workerId)!;
     if (!worker.isDevReload) {
       const signal = data.signal;
       const message = util.format(
         '[master] app_worker#%s:%s died (code: %s, signal: %s, suicide: %s, state: %s), current workers: %j',
         worker.id, worker.workerId, worker.exitCode, signal,
         worker.exitedAfterDisconnect, worker.state,
-        this.workerManager.getWorkers()
+        this.workerManager.listWorkerIds(),
       );
       if (this.options.isDebug && signal === 'SIGKILL') {
         // exit if died during debug
@@ -429,7 +438,6 @@ class Master extends EventEmitter {
         action: 'app-worker-died',
         to: 'parent',
       });
-
     } else {
       // exit if died during startup
       this.logger.error('[master] app_worker#%s:%s start fail, exiting with code:1',
@@ -440,12 +448,11 @@ class Master extends EventEmitter {
 
   /**
    * after app worker
-   * @param {Object} data
-   *  - {String} workerId - worker id
-   *  - {Object} address - server address
    */
-  onAppStart(data) {
-    const worker = this.workerManager.getWorker(data.workerId);
+  onAppStart(data: {
+    workerId: number;
+    address: ListeningAddress;
+  }) {
     const address = data.address;
 
     // worker should listen stickyWorkerPort when sticky mode
@@ -456,7 +463,7 @@ class Master extends EventEmitter {
       // worker should listen REALPORT when not sticky mode
     } else if (this.options.startMode !== 'worker_threads' &&
       !isUnixSock(address) &&
-      (String(address.port) !== String(this[REAL_PORT]))) {
+      (String(address.port) !== String(this.#realPort))) {
       return;
     }
 
@@ -469,9 +476,11 @@ class Master extends EventEmitter {
 
     this.appWorker.startSuccessCount++;
 
+    const worker = this.workerManager.getWorker(data.workerId)!;
     const remain = this.appWorker.isAllWorkerStarted ? 0 : this.options.workers - this.appWorker.startSuccessCount;
     this.log('[master] app_worker#%s:%s started at %s, remain %s (%sms)',
-      worker.id, worker.workerId, address.port, remain, Date.now() - this.appWorker.startTime);
+      worker.id, worker.workerId, address.port, remain,
+      Date.now() - this.appWorker.startTime);
 
     // Send egg-ready when app is started after launched
     if (this.appWorker.isAllWorkerStarted) {
@@ -494,18 +503,19 @@ class Master extends EventEmitter {
     this.appWorker.isAllWorkerStarted = true;
 
     // enable all workers when app started
-    for (const id of this.workerManager.getWorkers()) {
-      const worker = this.workerManager.getWorker(id);
+    for (const worker of this.workerManager.listWorkers()) {
       worker.disableRefork = false;
     }
 
-    address.protocol = this[PROTOCOL];
-    address.port = this.options.sticky ? this[REAL_PORT] : address.port;
-    this[APP_ADDRESS] = getAddress(address);
+    address.protocol = this.#protocol;
+    address.port = this.options.sticky ? this.#realPort! : address.port;
+    this.#appAddress = getAddress(address);
 
     if (this.options.sticky) {
       this.startMasterSocketServer(err => {
-        if (err) return this.ready(err);
+        if (err) {
+          return this.ready(err);
+        }
         this.ready(true);
       });
     } else {
@@ -516,14 +526,13 @@ class Master extends EventEmitter {
   /**
    * master exit handler
    */
-
-  onExit(code) {
+  onExit(code: number) {
     if (this.options.pidFile && fs.existsSync(this.options.pidFile)) {
       try {
         fs.unlinkSync(this.options.pidFile);
-      } catch (err) {
+      } catch (err: any) {
         /* istanbul ignore next */
-        this.logger.error('[master] delete pidfile %s fail with %s', this.options.pidFile, err.message);
+        this.logger.error('[master] delete pidFile %s fail with %s', this.options.pidFile, err.message);
       }
     }
     // istanbul can't cover here
@@ -532,11 +541,10 @@ class Master extends EventEmitter {
     this.logger[level]('[master] exit with code:%s', code);
   }
 
-  onSignal(signal) {
+  onSignal(signal: string) {
     if (this.closed) return;
 
     this.logger.info('[master] master is killed by signal %s, closing', signal);
-
     // logger more info
     const { used_heap_size, heap_size_limit } = v8.getHeapStatistics();
     this.logger.info('[master] system memory: total %s, free %s', os.totalmem(), os.freemem());
@@ -549,12 +557,11 @@ class Master extends EventEmitter {
    * reload workers, for develop purpose
    */
   onReload() {
-    this.log('[master] reload workers...');
-    for (const id of this.workerManager.getWorkers()) {
-      const worker = this.workerManager.getWorker(id);
+    this.log('[master] reload %s workers...', this.options.workers);
+    for (const worker of this.workerManager.listWorkers()) {
       worker.isDevReload = true;
     }
-    require('cluster-reload')(this.options.workers);
+    reload(this.options.workers);
   }
 
   async close() {
@@ -563,7 +570,7 @@ class Master extends EventEmitter {
       await this._doClose();
       this.log('[master] close done, exiting with code:0');
       process.exit(0);
-    } catch (e) /* istanbul ignore next */ {
+    } catch (e) {
       this.logger.error('[master] close with error: ', e);
       process.exit(1);
     }
@@ -573,14 +580,14 @@ class Master extends EventEmitter {
     // kill app workers
     // kill agent worker
     // exit itself
-    const legacyTimeout = process.env.EGG_MASTER_CLOSE_TIMEOUT || 5000;
-    const appTimeout = process.env.EGG_APP_CLOSE_TIMEOUT || legacyTimeout;
-    const agentTimeout = process.env.EGG_AGENT_CLOSE_TIMEOUT || legacyTimeout;
+    const legacyTimeout = process.env.EGG_MASTER_CLOSE_TIMEOUT || '5000';
+    const appTimeout = parseInt(process.env.EGG_APP_CLOSE_TIMEOUT || legacyTimeout);
+    const agentTimeout = parseInt(process.env.EGG_AGENT_CLOSE_TIMEOUT || legacyTimeout);
     this.logger.info('[master] send kill SIGTERM to app workers, will exit with code:0 after %sms', appTimeout);
     this.logger.info('[master] wait %sms', appTimeout);
     try {
       await this.killAppWorkers(appTimeout);
-    } catch (e) /* istanbul ignore next */ {
+    } catch (e) {
       this.logger.error('[master] app workers exit error: ', e);
     }
     this.logger.info('[master] send kill SIGTERM to agent worker, will exit with code:0 after %sms', agentTimeout);
@@ -593,13 +600,19 @@ class Master extends EventEmitter {
   }
 }
 
-module.exports = Master;
-
-function isProduction(options) {
+function isProduction(options: ClusterOptions) {
   if (options.env) {
     return options.env !== 'local' && options.env !== 'unittest';
   }
   return process.env.NODE_ENV === 'production';
+}
+
+interface ListeningAddress {
+  port: number;
+  protocol: string;
+  address?: string;
+  // https://nodejs.org/api/cluster.html#cluster_event_listening_1
+  addressType?: number;
 }
 
 function getAddress({
@@ -607,10 +620,12 @@ function getAddress({
   address,
   port,
   protocol,
-}) {
+}: ListeningAddress) {
   // unix sock
   // https://nodejs.org/api/cluster.html#cluster_event_listening_1
-  if (addressType === -1) return address;
+  if (addressType === -1) {
+    return address!;
+  }
 
   let hostname = address;
   if (!hostname && process.env.HOST && process.env.HOST !== '0.0.0.0') {
@@ -622,6 +637,6 @@ function getAddress({
   return `${protocol}://${hostname}:${port}`;
 }
 
-function isUnixSock(address) {
+function isUnixSock(address: ListeningAddress) {
   return address.addressType === -1;
 }

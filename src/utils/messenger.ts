@@ -1,11 +1,27 @@
-'use strict';
+import { debuglog } from 'node:util';
+import workerThreads from 'node:worker_threads';
+import type { Master } from '../master.js';
+import type { WorkerManager } from './worker_manager.js';
 
-const debug = require('util').debuglog('egg-cluster:messenger');
-const workerThreads = require('worker_threads');
+const debug = debuglog('@eggjs/cluster/messenger');
 
+export type MessageCharacter = 'agent' | 'app' | 'master' | 'parent';
+
+export interface MessageBody {
+  action: string;
+  data?: unknown;
+  to?: MessageCharacter;
+  from?: MessageCharacter;
+  /**
+   * @deprecated Keep compatible, please use receiverWorkerId instead
+   */
+  receiverPid?: string;
+  receiverWorkerId?: string;
+  senderWorkerId?: string;
+}
 
 /**
- * master messenger,provide communication between parent, master, agent and app.
+ * master messenger, provide communication between parent, master, agent and app.
  *
  *             ┌────────┐
  *             │ parent │
@@ -26,7 +42,7 @@ const workerThreads = require('worker_threads');
  * process.send({
  *   action: 'xxx',
  *   data: '',
- *   to: 'agent/master/parent', // default to app
+ *   to: 'agent/master/parent', // default to agent
  * });
  * ```
  *
@@ -36,7 +52,7 @@ const workerThreads = require('worker_threads');
  * process.send({
  *   action: 'xxx',
  *   data: '',
- *   to: 'app/master/parent', // default to agent
+ *   to: 'app/master/parent', // default to app
  * });
  * ```
  *
@@ -46,22 +62,25 @@ const workerThreads = require('worker_threads');
  * process.send({
  *   action: 'xxx',
  *   data: '',
- *   to: 'app/agent/master', // default to be ignore
+ *   to: 'app/agent/master', // default to master
  * });
  * ```
  */
-class Messenger {
+export class Messenger {
+  #master: Master;
+  #workerManager: WorkerManager;
+  #hasParent: boolean;
 
-  constructor(master, workerManager) {
-    this.master = master;
-    this.workerManager = workerManager;
-    this.hasParent = !!workerThreads.parentPort || !!process.send;
-    process.on('message', msg => {
+  constructor(master: Master, workerManager: WorkerManager) {
+    this.#master = master;
+    this.#workerManager = workerManager;
+    this.#hasParent = !!workerThreads.parentPort || !!process.send;
+    process.on('message', (msg: MessageBody) => {
       msg.from = 'parent';
       this.send(msg);
     });
     process.once('disconnect', () => {
-      this.hasParent = false;
+      this.#hasParent = false;
     });
   }
 
@@ -71,16 +90,18 @@ class Messenger {
    *  - {String} from from who
    *  - {String} to to who
    */
-  send(data) {
+  send(data: MessageBody) {
     if (!data.from) {
       data.from = 'master';
     }
 
-    // recognise receiverPid is to who
-    if (data.receiverPid) {
-      if (data.receiverPid === String(process.pid)) {
+    // https://github.com/eggjs/egg/blob/b6861f1c7548f05a281386050dfeaeb30f236558/lib/core/messenger/ipc.js#L56
+    // recognize receiverWorkerId is to who
+    const receiverWorkerId = data.receiverWorkerId ?? data.receiverPid;
+    if (receiverWorkerId) {
+      if (receiverWorkerId === String(process.pid)) {
         data.to = 'master';
-      } else if (data.receiverPid === String(this.workerManager.getAgent().workerId)) {
+      } else if (receiverWorkerId === String(this.#workerManager.getAgent()!.workerId)) {
         data.to = 'agent';
       } else {
         data.to = 'app';
@@ -89,9 +110,15 @@ class Messenger {
 
     // default from -> to rules
     if (!data.to) {
-      if (data.from === 'agent') data.to = 'app';
-      if (data.from === 'app') data.to = 'agent';
-      if (data.from === 'parent') data.to = 'master';
+      if (data.from === 'agent') {
+        data.to = 'app';
+      }
+      if (data.from === 'app') {
+        data.to = 'agent';
+      }
+      if (data.from === 'parent') {
+        data.to = 'master';
+      }
     }
 
     // app -> master
@@ -133,34 +160,33 @@ class Messenger {
    * send message to master self
    * @param {Object} data message body
    */
-  sendToMaster(data) {
-    this.master.emit(data.action, data.data);
+  sendToMaster(data: MessageBody) {
+    this.#master.emit(data.action, data.data);
   }
 
   /**
    * send message to parent process
    * @param {Object} data message body
    */
-  sendToParent(data) {
-    if (!this.hasParent) {
+  sendToParent(data: MessageBody) {
+    if (!this.#hasParent) {
       return;
     }
-    process.send(data);
+    process.send!(data);
   }
 
   /**
    * send message to app worker
    * @param {Object} data message body
    */
-  sendToAppWorker(data) {
-    const workerManager = this.workerManager;
-    for (const id of workerManager.listWorkerIds()) {
-      const worker = workerManager.getWorker(id);
+  sendToAppWorker(data: MessageBody) {
+    for (const worker of this.#workerManager.listWorkers()) {
       if (worker.state === 'disconnected') {
         continue;
       }
-      // check receiverPid
-      if (data.receiverPid && data.receiverPid !== String(worker.workerId)) {
+      // check receiverWorkerId
+      const receiverWorkerId = data.receiverWorkerId ?? data.receiverPid;
+      if (receiverWorkerId && receiverWorkerId !== String(worker.workerId)) {
         continue;
       }
       worker.send(data);
@@ -171,13 +197,10 @@ class Messenger {
    * send message to agent worker
    * @param {Object} data message body
    */
-  sendToAgentWorker(data) {
-    const agent = this.workerManager.getAgent();
+  sendToAgentWorker(data: MessageBody) {
+    const agent = this.#workerManager.getAgent();
     if (agent) {
       agent.send(data);
     }
   }
-
 }
-
-module.exports = Messenger;

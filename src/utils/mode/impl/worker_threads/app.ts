@@ -1,18 +1,16 @@
-'use strict';
+import { setTimeout as sleep } from 'node:timers/promises';
+import { Worker as ThreadWorker, threadId, parentPort, type WorkerOptions } from 'node:worker_threads';
+import type { Options as gracefulExitOptions } from 'graceful-process';
+import { BaseAppWorker, BaseAppUtils } from '../../base/app.js';
+import type { MessageBody } from '../../../messenger.js';
 
-const { sleep } = require('../../../timer');
-const workerThreads = require('worker_threads');
-const { BaseAppWorker, BaseAppUtils } = require('../../base/app');
-
-class AppWorker extends BaseAppWorker {
-  #id = 0;
-  #threadId = -1;
+export class AppThreadWorker extends BaseAppWorker<ThreadWorker> {
   #state = 'none';
+  #id: number;
 
-  constructor(instance, id) {
+  constructor(instance: ThreadWorker, id: number) {
     super(instance);
     this.#id = id;
-    this.#threadId = instance.threadId;
   }
 
   get id() {
@@ -20,7 +18,7 @@ class AppWorker extends BaseAppWorker {
   }
 
   get workerId() {
-    return this.#threadId;
+    return this.instance.threadId;
   }
 
   get state() {
@@ -36,53 +34,54 @@ class AppWorker extends BaseAppWorker {
   }
 
   get exitCode() {
-    return this.instance.exitCode;
+    return 0;
+    // return this.instance.exitCode;
   }
 
-  send(...args) {
-    this.instance.postMessage(...args);
+  send(message: MessageBody) {
+    this.instance.postMessage(message);
   }
 
   clean() {
     this.instance.removeAllListeners();
   }
 
-  static on(event, callback) {
-    workerThreads.parentPort.on(event, callback);
+  static on(event: string, listener: (...args: any[]) => void) {
+    parentPort!.on(event, listener);
   }
 
-  static send(data) {
-    workerThreads.parentPort.postMessage(data);
+  static send(message: MessageBody) {
+    message.senderWorkerId = String(threadId);
+    parentPort!.postMessage(message);
   }
 
   static kill() {
     process.exit(1);
   }
 
-  static gracefulExit(options) {
-    const { beforeExit } = options;
+  static gracefulExit(options: gracefulExitOptions) {
     process.on('exit', async code => {
-      if (typeof beforeExit === 'function') {
-        await beforeExit();
+      if (typeof options.beforeExit === 'function') {
+        await options.beforeExit();
       }
       process.exit(code);
     });
   }
 }
 
-class AppUtils extends BaseAppUtils {
-  #workers = [];
+export class AppThreadUtils extends BaseAppUtils {
+  #workers: ThreadWorker[] = [];
 
-  #forkSingle(appPath, options, id) {
+  #forkSingle(appPath: string, options: WorkerOptions, id: number) {
     // start app worker
-    const worker = new workerThreads.Worker(appPath, options);
+    const worker = new ThreadWorker(appPath, options);
     this.#workers.push(worker);
 
     // wrap app worker
-    const appWorker = new AppWorker(worker, id);
+    const appWorker = new AppThreadWorker(worker, id);
     this.emit('worker_forked', appWorker);
     appWorker.disableRefork = true;
-    worker.on('message', msg => {
+    worker.on('message', (msg: MessageBody) => {
       if (typeof msg === 'string') {
         msg = {
           action: msg,
@@ -94,7 +93,7 @@ class AppUtils extends BaseAppUtils {
     });
     this.log('[master] app_worker#%s (tid:%s) start', appWorker.id, appWorker.workerId);
 
-    // send debug message, due to `brk` scence, send here instead of app_worker.js
+    // send debug message, due to `brk` scene, send here instead of app_worker.js
     let debugPort = process.debugPort;
     if (this.options.isDebug) {
       debugPort++;
@@ -105,6 +104,7 @@ class AppUtils extends BaseAppUtils {
         data: {
           debugPort,
           pid: appWorker.workerId,
+          workerId: appWorker.workerId,
         },
       });
     }
@@ -155,9 +155,9 @@ class AppUtils extends BaseAppUtils {
     this.startTime = Date.now();
     this.startSuccessCount = 0;
 
-    const ports = this.options.ports;
+    const ports = this.options.ports ?? [];
     if (!ports.length) {
-      ports.push(this.options.port);
+      ports.push(this.options.port!);
     }
     this.options.workers = ports.length;
     let i = 0;
@@ -172,11 +172,10 @@ class AppUtils extends BaseAppUtils {
 
   async kill() {
     for (const worker of this.#workers) {
-      this.log(`[master] kill app worker#${worker.id} (worker_threads) by worker.terminate()`);
+      const id = Reflect.get(worker, 'id');
+      this.log(`[master] kill app worker#${id} (worker_threads) by worker.terminate()`);
       worker.removeAllListeners();
       worker.terminate();
     }
   }
 }
-
-module.exports = { AppWorker, AppUtils };

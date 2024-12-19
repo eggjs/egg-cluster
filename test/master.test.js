@@ -2,8 +2,8 @@ const path = require('path');
 const assert = require('assert');
 const fs = require('fs');
 const { rm } = require('fs/promises');
+const { once } = require('node:events');
 const cp = require('child_process');
-const pedding = require('pedding');
 const mm = require('egg-mock');
 const request = require('supertest');
 const awaitEvent = require('await-event');
@@ -431,18 +431,15 @@ describe('test/master.test.js', () => {
       app.expect('stdout', /parent -> app/);
     });
 
-    it('app/agent -> parent', done => {
-      done = pedding(3, done);
+    it('app/agent -> parent', async () => {
       app = utils.cluster('apps/messenger');
       // app.debug();
-      app.end(done);
-
-      setTimeout(() => {
-        app.proc.on('message', msg => {
-          if (msg.action === 'app2parent') done();
-          if (msg.action === 'agent2parent') done();
-        });
-      }, 1);
+      await app.end();
+      await sleep(1);
+      await Promise.all([
+        once(app.proc, 'app2parent'),
+        once(app.proc, 'agent2parent'),
+      ]);
     });
 
     it('should app <-> agent', async () => {
