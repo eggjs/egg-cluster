@@ -1,7 +1,7 @@
 # egg-cluster
 
 [![NPM version][npm-image]][npm-url]
-[![CI](https://github.com/eggjs/egg-cluster/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eggjs/egg-cluster/actions/workflows/nodejs.yml)
+[![CI](https://github.com/eggjs/cluster/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eggjs/cluster/actions/workflows/nodejs.yml)
 [![Test coverage][codecov-image]][codecov-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
@@ -9,8 +9,8 @@
 
 [npm-image]: https://img.shields.io/npm/v/@eggjs/cluster.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/@eggjs/cluster
-[codecov-image]: https://codecov.io/github/eggjs/egg-cluster/coverage.svg?branch=master
-[codecov-url]: https://codecov.io/github/eggjs/egg-cluster?branch=master
+[codecov-image]: https://codecov.io/github/eggjs/cluster/coverage.svg?branch=master
+[codecov-url]: https://codecov.io/github/eggjs/cluster?branch=master
 [snyk-image]: https://snyk.io/test/npm/@eggjs/cluster/badge.svg?style=flat-square
 [snyk-url]: https://snyk.io/test/npm/@eggjs/cluster
 [download-image]: https://img.shields.io/npm/dm/@eggjs/cluster.svg?style=flat-square
@@ -87,6 +87,6 @@ startCluster({
 
 ## Contributors
 
-[![Contributors](https://contrib.rocks/image?repo=eggjs/egg-cluster)](https://github.com/eggjs/egg-cluster/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=eggjs/cluster)](https://github.com/eggjs/cluster/graphs/contributors)
 
 Made with [contributors-img](https://contrib.rocks).
